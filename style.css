@@ -1,14 +1,12 @@
 body {
     margin: 0;
     font-family: sans-serif;
-    overflow-x: hidden;
   }
   
   #scrolly {
     display: flex;
     max-width: 1200px;
     margin: 0 auto;
-    height: 100vh;
   }
   
   .sticky-graphic {
