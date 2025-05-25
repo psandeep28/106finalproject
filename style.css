@@ -1,0 +1,26 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+  }
+  #scrolly {
+    display: flex;
+    max-width: 960px;
+    margin: 0 auto;
+    height: 100vh;
+  }
+  .sticky-graphic {
+    position: sticky;
+    top: 0;
+    width: 60%;
+    height: 100vh;
+  }
+  .scroll-text {
+    width: 40%;
+    overflow-y: scroll;
+    height: 100vh;
+  }
+  .step {
+    padding: 5rem 2rem;
+    font-size: 1.5rem;
+  }
+  
