@@ -1,34 +1,38 @@
 body {
     margin: 0;
     font-family: sans-serif;
+    overflow-x: hidden;
   }
+  
   #scrolly {
     display: flex;
-    max-width: 960px;
+    max-width: 1200px;
     margin: 0 auto;
     height: 100vh;
   }
+  
   .sticky-graphic {
     position: sticky;
     top: 0;
     width: 60%;
     height: 100vh;
-  }
-  .scroll-text {
-    width: 40%;
-    overflow-y: scroll;
-    height: 100vh;
-  }
-  .step {
-    padding: 50vh 2rem;
-    font-size: 1.5rem;
-    border-top: 2px solid black;
-    border-bottom: 2px solid black;
-    min-height: 100vh;
-  }
-
-  #scrolly {
-    height: 400vh; /* enough height to scroll through all steps */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f8f8;
   }
   
+  .scroll-text {
+    width: 40%;
+    height: 100vh;
+    overflow-y: scroll;
+    padding: 2rem;
+  }
+  
+  .step {
+    min-height: 100vh;
+    padding: 5rem 2rem;
+    font-size: 1.5rem;
+    border-bottom: 1px solid #ccc;
+  }
   
