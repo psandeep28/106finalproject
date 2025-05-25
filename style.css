@@ -20,7 +20,15 @@ body {
     height: 100vh;
   }
   .step {
-    padding: 5rem 2rem;
+    padding: 50vh 2rem;
     font-size: 1.5rem;
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    min-height: 100vh;
   }
+
+  #scrolly {
+    height: 400vh; /* enough height to scroll through all steps */
+  }
+  
   
