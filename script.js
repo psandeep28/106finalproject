@@ -1,54 +1,67 @@
-// Setup Scrollama
+// Initialize scrollama
 const scroller = scrollama();
 
-// Set up SVG
-const svgWidth = 600;
-const svgHeight = 400;
+// SVG setup
+const width = 600;
+const height = 400;
 
 const svg = d3.select("#chart")
-  .attr("width", svgWidth)
-  .attr("height", svgHeight);
+  .attr("width", width)
+  .attr("height", height);
 
-// Create 100 fake student entries
-const studentData = d3.range(100).map(i => ({
+// Create 100 fake students
+const data = d3.range(100).map(i => ({
   id: i,
   sleep: Math.random() > 0.5 ? "good" : "poor",
-  depressed: Math.random() > 0.7 ? true : false
+  depressed: Math.random() > 0.7,
+  x: Math.random() * width,
+  y: Math.random() * height
 }));
 
-// Initial dot layout (Step 0)
-function drawInitial() {
+// Initial render
+svg.selectAll("circle")
+  .data(data, d => d.id)
+  .enter()
+  .append("circle")
+  .attr("cx", d => d.x)
+  .attr("cy", d => d.y)
+  .attr("r", 5)
+  .attr("fill", "#aaa");
+
+// Step 0: Random scatter (reset)
+function step0() {
   svg.selectAll("circle")
-    .data(studentData, d => d.id)
-    .join("circle")
-    .attr("cx", () => Math.random() * svgWidth)
-    .attr("cy", () => Math.random() * svgHeight)
-    .attr("r", 5)
+    .transition()
+    .duration(800)
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
     .attr("fill", "#aaa");
+  
+  svg.selectAll("text").remove();
 }
 
-// Color by sleep quality (Step 1)
-function colorBySleep() {
+// Step 1: Color by sleep quality
+function step1() {
   svg.selectAll("circle")
     .transition()
     .duration(800)
     .attr("fill", d => d.sleep === "good" ? "#69b3a2" : "#f28e2b");
 }
 
-// Cluster by depression status (Step 2)
-function clusterByDepression() {
+// Step 2: Cluster by depression status
+function step2() {
   svg.selectAll("circle")
     .transition()
-    .duration(800)
+    .duration(1000)
     .attr("cx", d => d.depressed ? 200 : 400)
-    .attr("cy", () => 150 + Math.random() * 100)
+    .attr("cy", d => d.depressed ? 150 + Math.random() * 80 : 250 + Math.random() * 80)
     .attr("fill", d => d.depressed ? "#e15759" : "#4e79a7");
 }
 
-// Add a summary label (Step 3)
-function showLabel() {
+// Step 3: Add annotation label
+function step3() {
   svg.append("text")
-    .attr("x", svgWidth / 2)
+    .attr("x", width / 2)
     .attr("y", 30)
     .attr("text-anchor", "middle")
     .attr("font-size", "16px")
@@ -59,7 +72,7 @@ function showLabel() {
     .attr("opacity", 1);
 }
 
-// Scroll event handler
+// Scroll triggers
 scroller
   .setup({
     step: ".step",
@@ -69,9 +82,8 @@ scroller
   .onStepEnter(response => {
     const i = response.index;
 
-    if (i === 0) drawInitial();
-    if (i === 1) colorBySleep();
-    if (i === 2) clusterByDepression();
-    if (i === 3) showLabel();
+    if (i === 0) step0();
+    if (i === 1) step1();
+    if (i === 2) step2();
+    if (i === 3) step3();
   });
-
