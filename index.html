@@ -2,25 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MindScope: Explore Student Mental Health</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindScope: Profile Selection</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
-  <main id="scrolly">
-    <div class="sticky-graphic">
-      <svg id="chart" width="600" height="400"></svg>
-    </div>
-    <div class="scroll-text">
-      <div class="step">How does stress affect students?</div>
-      <div class="step">Let’s explore the data...</div>
-      <div class="step">Try changing your habits.</div>
-      <div class="step">You’re not alone.</div>
-    </div>
-  </main>
 
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://unpkg.com/scrollama"></script>
+  <!-- PAGE 1: WELCOME -->
+  <div class="page" id="welcomePage">
+    <h1>🎓 Welcome to MindScope</h1>
+    <p>Explore how your academic path may shape your mental wellness.</p>
+    <button onclick="goTo('profileSelectPage')">Start Game</button>
+  </div>
+
+  <!-- PAGE 2: PROFILE SELECTION -->
+  <div class="page hidden" id="profileSelectPage">
+    <h2>Choose Your Profile</h2>
+    <div class="profile-options">
+      <button onclick="selectProfile('Engineering')">Engineering</button>
+      <button onclick="selectProfile('Business')">Business</button>
+      <button onclick="selectProfile('Medicine')">Medicine</button>
+      <button onclick="selectProfile('Arts & Humanities')">Arts & Humanities</button>
+    </div>
+  </div>
+
+  <!-- PAGE 3: PROFILE STATS VISUALIZED -->
+  <div class="page hidden" id="profileStatsPage">
+    <h2 id="profileTitle"></h2>
+    <div id="chartContainer">
+      <svg id="barChart" width="400" height="200"></svg>
+      <svg id="cgpaBar" width="400" height="60"></svg>
+      <svg id="depressionDonut" width="200" height="200"></svg>
+    </div>
+    <p id="sleepLabel"></p>
+    <button onclick="confirmProfile()">Yes, start with this profile →</button>
+    <button onclick="goTo('profileSelectPage')">← Go Back</button>
+  </div>
+
   <script src="script.js"></script>
+  <script src="charts.js"></script>
 </body>
 </html>

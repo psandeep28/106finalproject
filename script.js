@@ -1,89 +1,32 @@
-// Initialize scrollama
-const scroller = scrollama();
+let selectedProfile = null;
+let allCSVData = [];
 
-// SVG setup
-const width = 600;
-const height = 400;
+d3.csv("data/mindscope_profiles_cleaned.csv", d3.autoType).then(data => {
+  allCSVData = data;
+});
 
-const svg = d3.select("#chart")
-  .attr("width", width)
-  .attr("height", height);
+function goTo(pageId) {
+  document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
+  document.getElementById(pageId).classList.remove("hidden");
+}
 
-// Create 100 fake students
-const data = d3.range(100).map(i => ({
-  id: i,
-  sleep: Math.random() > 0.5 ? "good" : "poor",
-  depressed: Math.random() > 0.7,
-  x: Math.random() * width,
-  y: Math.random() * height
-}));
+function selectProfile(name) {
+  selectedProfile = name;
+  const stats = processProfileData(allCSVData, name);
 
-// Initial render
-svg.selectAll("circle")
-  .data(data, d => d.id)
-  .enter()
-  .append("circle")
-  .attr("cx", d => d.x)
-  .attr("cy", d => d.y)
-  .attr("r", 5)
-  .attr("fill", "#aaa");
+  document.getElementById("profileTitle").textContent = `${name} Profile`;
+  document.getElementById("sleepLabel").textContent = `Most Common Sleep Duration: ${stats.sleep}`;
 
-// Step 0: Random scatter (reset)
-function step0() {
-  svg.selectAll("circle")
-    .transition()
-    .duration(800)
-    .attr("cx", d => d.x)
-    .attr("cy", d => d.y)
-    .attr("fill", "#aaa");
+  renderBarChart(stats);
+  renderCGPA(stats);
+  renderDonut(stats);
+
+  goTo("profileStatsPage");
+}
+
+function confirmProfile() {
+  alert(`You selected the ${selectedProfile} profile. Let's begin your journey!`);
+  // Replace this with the next phase navigation
+}
+
   
-  svg.selectAll("text").remove();
-}
-
-// Step 1: Color by sleep quality
-function step1() {
-  svg.selectAll("circle")
-    .transition()
-    .duration(800)
-    .attr("fill", d => d.sleep === "good" ? "#69b3a2" : "#f28e2b");
-}
-
-// Step 2: Cluster by depression status
-function step2() {
-  svg.selectAll("circle")
-    .transition()
-    .duration(1000)
-    .attr("cx", d => d.depressed ? 200 : 400)
-    .attr("cy", d => d.depressed ? 150 + Math.random() * 80 : 250 + Math.random() * 80)
-    .attr("fill", d => d.depressed ? "#e15759" : "#4e79a7");
-}
-
-// Step 3: Add annotation label
-function step3() {
-  svg.append("text")
-    .attr("x", width / 2)
-    .attr("y", 30)
-    .attr("text-anchor", "middle")
-    .attr("font-size", "16px")
-    .attr("opacity", 0)
-    .text("Clustered by Depression Status")
-    .transition()
-    .duration(800)
-    .attr("opacity", 1);
-}
-
-// Scroll triggers
-scroller
-  .setup({
-    step: ".step",
-    offset: 0.5,
-    debug: false
-  })
-  .onStepEnter(response => {
-    const i = response.index;
-
-    if (i === 0) step0();
-    if (i === 1) step1();
-    if (i === 2) step2();
-    if (i === 3) step3();
-  });
