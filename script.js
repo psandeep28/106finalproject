@@ -113,7 +113,7 @@ function createRadarChart(data) {
 
 // Load data from CSV on page load
 window.onload = () => {
-  d3.csv("data/mindscope_profiles_cleaned.csv", d3.autoType).then(data => {
+    d3.csv("data/mindscope_profiles_transformed_clean.csv", d3.autoType).then(data => {
     data.forEach(row => {
       careerData[row.career] = {
         name: row.career,
