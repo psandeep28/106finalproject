@@ -1,55 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MindScope: The Journey</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Career Path Chronicles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://d3js.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 </head>
 <body>
+  <!-- Welcome Screen -->
+  <div id="welcome-screen" class="page">
+    <div class="background"></div>
+    <div class="scanlines"></div>
+    <div class="welcome-container">
+      <h1 class="game-title">CAREER PATH CHRONICLES</h1>
+      <h2 class="subtitle">Depression Risk Explorer<span class="cursor"></span></h2>
+      <div class="description">
+        <p>Welcome to an interactive journey through the complex world of student mental health and career choices.</p>
+        <p>Explore how different factors like <span class="highlight">sleep patterns</span>, <span class="highlight">academic pressure</span>, and <span class="highlight">financial stress</span> influence depression risk across career fields.</p>
+        <p>Navigate through data-driven visualizations to discover insights that can help guide students toward healthier paths.</p>
+      </div>
+      <button class="start-button" onclick="startGame()">► START EXPLORATION</button>
+    </div>
+    <div class="credits">Data Visualization Project | DSC 106 Final</div>
+  </div>
 
-  <!-- PAGE 1: WELCOME / START SCREEN -->
-  <div class="page" id="welcomePage">
-    <div style="position: absolute; top: 1rem; left: 1rem;">
-      <p style="color: #ffcc00;">HI-SCORE<br>123000</p>
-    </div>
-    <div style="position: absolute; top: 1rem; right: 1rem;">
-      ❤️ ❤️ ❤️ ❤️ ❤️
-    </div>
-    <h1>▶ START</h1>
-    <p>ARE YOU READY?</p>
-    <div>
-      <button onclick="goTo('profileSelectPage')">YES</button>
-      <button disabled>NO</button>
+  <!-- Profiles Page -->
+  <div id="profiles-screen" class="page hidden">
+    <button class="back-button" onclick="goBack()">← BACK</button>
+    <div class="container">
+      <div class="header">
+        <h1 class="page-title">CAREER PROFILE ANALYSIS</h1>
+        <p class="instruction">Click on a career field to explore depression risk and wellbeing stats</p>
+      </div>
+      <div class="career-grid">
+        <!-- Cards will be dynamically populated -->
+      </div>
+      <div id="visualization-panel" class="visualization-panel hidden">
+        <h2 class="viz-title" id="viz-title">SELECT A CAREER TO EXPLORE</h2>
+        <div class="viz-container">
+          <div class="chart-area">
+            <div id="chart-container"></div>
+          </div>
+          <div class="info-panel">
+            <div class="info-section">
+              <h3>Risk Assessment</h3>
+              <div class="metric-bar"><div class="metric-fill depression-fill" id="depression-bar"></div></div>
+              <p id="depression-text">Depression Rate: --</p>
+            </div>
+            <div class="info-section">
+              <h3>Sleep Quality</h3>
+              <div class="metric-bar"><div class="metric-fill sleep-fill" id="sleep-bar"></div></div>
+              <p id="sleep-text">Average Sleep: --</p>
+            </div>
+            <div class="info-section">
+              <h3>Stress Levels</h3>
+              <div class="metric-bar"><div class="metric-fill stress-fill" id="stress-bar"></div></div>
+              <p id="stress-text">Stress Level: --</p>
+            </div>
+            <div class="info-section">
+              <h3>Key Insights</h3>
+              <p id="insights-text">Select a career field to see detailed analysis and patterns.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- PAGE 2: PROFILE SELECTION -->
-  <div class="page hidden" id="profileSelectPage">
-    <h2>CHOOSE YOUR PROFILE</h2>
-    <div class="profile-options">
-      <button onclick="selectProfile('Engineering')">ENGINEERING</button>
-      <button onclick="selectProfile('Business')">BUSINESS</button>
-      <button onclick="selectProfile('Medicine')">MEDICINE</button>
-      <button onclick="selectProfile('Arts & Humanities')">ARTS & HUMANITIES</button>
-    </div>
-  </div>
-
-  <!-- PAGE 3: PROFILE STATS -->
-  <div class="page hidden" id="profileStatsPage">
-    <h2 id="profileTitle"></h2>
-    <div id="chartContainer">
-      <svg id="barChart" width="400" height="200"></svg>
-      <svg id="cgpaBar" width="400" height="60"></svg>
-      <svg id="depressionDonut" width="200" height="200"></svg>
-    </div>
-    <p id="sleepLabel"></p>
-    <button onclick="confirmProfile()">YES — START WITH THIS PROFILE →</button>
-    <button onclick="goTo('profileSelectPage')">← BACK</button>
-  </div>
-
-  <script src="charts.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
