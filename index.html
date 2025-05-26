@@ -2,31 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MindScope: Profile Selection</title>
+  <title>MindScope: The Journey</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
 
-  <!-- PAGE 1: WELCOME -->
+  <!-- PAGE 1: WELCOME / START SCREEN -->
   <div class="page" id="welcomePage">
-    <h1>🎓 Welcome to MindScope</h1>
-    <p>Explore how your academic path may shape your mental wellness.</p>
-    <button onclick="goTo('profileSelectPage')">Start Game</button>
+    <div style="position: absolute; top: 1rem; left: 1rem;">
+      <p style="color: #ffcc00;">HI-SCORE<br>123000</p>
+    </div>
+    <div style="position: absolute; top: 1rem; right: 1rem;">
+      ❤️ ❤️ ❤️ ❤️ ❤️
+    </div>
+    <h1>▶ START</h1>
+    <p>ARE YOU READY?</p>
+    <div>
+      <button onclick="goTo('profileSelectPage')">YES</button>
+      <button disabled>NO</button>
+    </div>
   </div>
 
   <!-- PAGE 2: PROFILE SELECTION -->
   <div class="page hidden" id="profileSelectPage">
-    <h2>Choose Your Profile</h2>
+    <h2>CHOOSE YOUR PROFILE</h2>
     <div class="profile-options">
-      <button onclick="selectProfile('Engineering')">Engineering</button>
-      <button onclick="selectProfile('Business')">Business</button>
-      <button onclick="selectProfile('Medicine')">Medicine</button>
-      <button onclick="selectProfile('Arts & Humanities')">Arts & Humanities</button>
+      <button onclick="selectProfile('Engineering')">ENGINEERING</button>
+      <button onclick="selectProfile('Business')">BUSINESS</button>
+      <button onclick="selectProfile('Medicine')">MEDICINE</button>
+      <button onclick="selectProfile('Arts & Humanities')">ARTS & HUMANITIES</button>
     </div>
   </div>
 
-  <!-- PAGE 3: PROFILE STATS VISUALIZED -->
+  <!-- PAGE 3: PROFILE STATS -->
   <div class="page hidden" id="profileStatsPage">
     <h2 id="profileTitle"></h2>
     <div id="chartContainer">
@@ -35,11 +45,11 @@
       <svg id="depressionDonut" width="200" height="200"></svg>
     </div>
     <p id="sleepLabel"></p>
-    <button onclick="confirmProfile()">Yes, start with this profile →</button>
-    <button onclick="goTo('profileSelectPage')">← Go Back</button>
+    <button onclick="confirmProfile()">YES — START WITH THIS PROFILE →</button>
+    <button onclick="goTo('profileSelectPage')">← BACK</button>
   </div>
 
-  <script src="script.js"></script>
   <script src="charts.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

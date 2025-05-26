@@ -1,34 +1,55 @@
 body {
-    font-family: sans-serif;
-    background: #f4f4f4;
+    font-family: 'Press Start 2P', monospace;
+    background: radial-gradient(circle at center, #2d0030 0%, #1a001f 100%);
+    color: #ffcc00;
     margin: 0;
-    padding: 2rem;
+    padding: 0;
     text-align: center;
   }
   
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+  
   .page {
     display: none;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
   
   .page:not(.hidden) {
-    display: block;
+    display: flex;
   }
   
   button {
-    font-size: 1rem;
-    padding: 0.75rem 1.5rem;
+    font-family: 'Press Start 2P', monospace;
+    background-color: #330033;
+    color: #ff6600;
+    border: 2px solid #ff6600;
+    padding: 1rem 2rem;
     margin: 1rem;
+    text-transform: uppercase;
     cursor: pointer;
-    background: #007acc;
-    color: white;
-    border: none;
-    border-radius: 5px;
+  }
+  
+  button:disabled {
+    color: #444;
+    border-color: #444;
+    background-color: #222;
+    cursor: not-allowed;
+  }
+  
+  h1, h2, p {
+    color: #ff9900;
+    margin-bottom: 1rem;
   }
   
   .profile-options button {
-    background: #eee;
-    color: #333;
-    border: 1px solid #ccc;
+    background-color: #1a001f;
+    border: 2px solid #ffcc00;
+    color: #ffcc00;
     margin: 0.5rem;
   }
   
@@ -41,8 +62,13 @@ body {
   }
   
   svg {
-    background: white;
-    border: 1px solid #ccc;
+    background: #1a001f;
+    border: 2px solid #ff6600;
     border-radius: 4px;
+  }
+  
+  #sleepLabel {
+    color: #ffffff;
+    font-size: 12px;
   }
   
