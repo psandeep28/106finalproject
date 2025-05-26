@@ -32,8 +32,8 @@ function updateInfoPanel(data) {
   document.getElementById("depression-text").textContent = `Depression Rate: ${(data.depressionRate * 100).toFixed(1)}%`;
   document.getElementById("sleep-bar").style.width = data.sleepScore + "%";
   document.getElementById("sleep-text").textContent = `Average Sleep: ${data.avgSleep}`;
-  document.getElementById("stress-bar").style.width = (data.stressLevel / 5 * 100) + "%";
-  document.getElementById("stress-text").textContent = `Stress Level: ${data.stressLevel}/5`;
+  document.getElementById("stress-bar").style.width = (data.stressLevel * 100) + "%";
+  document.getElementById("stress-text").textContent = `Stress Level: ${(data.stressLevel * 5).toFixed(2)}/5`;  
   document.getElementById("insights-text").textContent = data.insights;
 }
 
@@ -113,8 +113,8 @@ function createRadarChart(data) {
 
 // Load data from CSV on page load
 window.onload = () => {
-    d3.csv("data/mindscope_profiles_transformed_clean.csv", d3.autoType).then(data => {
-    data.forEach(row => {
+    d3.csv("data/mindscope_profiles_final_clean_FIXED.csv", d3.autoType).then(data => {
+        data.forEach(row => {
       careerData[row.career] = {
         name: row.career,
         depressionRate: row.depressionRate,
