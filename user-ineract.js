@@ -17,4 +17,11 @@ let testData = {
   ],
 };
 
+function addSliderValues() {
+  let sliders = Array.from(document.getElementsByClassName('slider-input'));
+  console.log(sliders);
+}
+
+
 createRadarChart(testData, '#user-profile');
+addSliderValues();

@@ -6,12 +6,14 @@ let careerData = {};
 function startGame() {
   document.getElementById("welcome-screen").classList.add("hidden");
   document.getElementById("profiles-screen").classList.remove("hidden");
+  document.getElementById('user-interaction').classList.remove('hidden');
 }
 
 function goBack() {
   document.getElementById("profiles-screen").classList.add("hidden");
   document.getElementById("welcome-screen").classList.remove("hidden");
   document.getElementById("visualization-panel").classList.add("hidden");
+  document.getElementById('user-interaction').classList.add('hidden');
 }
 
 function selectCareer(career) {
@@ -47,22 +49,22 @@ function createRadarChart(data, containId='#chart-container') {
     const width = 400;
     const height = 400;
     const radius = Math.min(width, height) / 2 - 40;
-  
+
     const svg = container.append("svg")
       .attr("width", width)
       .attr("height", height);
-  
+
     const g = svg.append("g")
       .attr("transform", `translate(${width / 2}, ${height / 2})`);
-  
+
     const angleScale = d3.scaleLinear()
       .domain([0, data.detailData.length])
       .range([0, 2 * Math.PI]);
-  
+
     const radiusScale = d3.scaleLinear()
       .domain([0, 100])
       .range([0, radius]);
-  
+
     // Grid circles
     for (let i = 1; i <= 5; i++) {
       g.append("circle")
@@ -72,20 +74,20 @@ function createRadarChart(data, containId='#chart-container') {
         .attr("stroke-opacity", 0.3)
         .attr("stroke-width", 1);
     }
-  
+
     // Axis lines and labels
     data.detailData.forEach((d, i) => {
       const angle = angleScale(i) - Math.PI / 2;
       const x = Math.cos(angle) * radius;
       const y = Math.sin(angle) * radius;
-  
+
       g.append("line")
         .attr("x1", 0).attr("y1", 0)
         .attr("x2", x).attr("y2", y)
         .attr("stroke", "#00ff00")
         .attr("stroke-opacity", 0.5)
         .attr("stroke-width", 1);
-  
+
       g.append("text")
         .attr("x", Math.cos(angle) * (radius + 20))
         .attr("y", Math.sin(angle) * (radius + 20))
@@ -96,14 +98,14 @@ function createRadarChart(data, containId='#chart-container') {
         .attr("font-size", "10px")
         .text(d.factor);
     });
-  
+
     // Area path
     const area = d3.areaRadial()
       .angle((d, i) => angleScale(i))
       .innerRadius(0)
       .outerRadius(d => radiusScale(d.value))
       .curve(d3.curveLinearClosed);
-  
+
     const radarPath = g.append("path")
       .datum(data.detailData)
       .attr("fill", "#ff00ff")
@@ -122,7 +124,7 @@ function createRadarChart(data, containId='#chart-container') {
       .duration(1200)
       .ease(d3.easeCubicInOut)
       .attr("stroke-dashoffset", 0);
-  
+
     // Tooltip logic
     let locked = false;
     let tooltip = d3.select("body").select(".tooltip");
@@ -141,7 +143,7 @@ function createRadarChart(data, containId='#chart-container') {
         .style("pointer-events", "none")
         .style("opacity", 0);
     }
-  
+
     // Data points with hover + click-to-lock
     g.selectAll(".data-point")
       .data(data.detailData)
@@ -182,7 +184,7 @@ function createRadarChart(data, containId='#chart-container') {
           d3.select(this).transition().duration(150).attr("r", 4);
         }
       });
-  
+
     // Optional: Add mini legend below
     container.append("div")
       .attr("class", "legend")
@@ -196,7 +198,7 @@ function createRadarChart(data, containId='#chart-container') {
         <span style="color:#ff00ff;">▰</span> Risk polygon
       `);
   }
-  
+
 
 // Load data from CSV on page load
 window.onload = () => {
