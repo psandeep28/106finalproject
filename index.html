@@ -11,17 +11,15 @@
   <script type='module' src="./script.js"></script>
 </head>
 <body>
-  <!-- Load functions from the modules for use in the interactive elements
-       (if you update this, add the export to the module you are using
-       and then import whatever code you need here)
-  -->
+  <!-- Load functions from the modules for use in the interactive elements -->
   <script type='module'>
-   import { startGame, goBack } from './script.js';
-   let backbtn = document.getElementsByClassName('back-button')[0];
-   let strtbtn = document.getElementsByClassName('start-button')[0];
-   backbtn.addEventListener('click', goBack);
-   strtbtn.addEventListener('click', startGame);
+    import { startGame, goBack } from './script.js';
+    let backbtn = document.getElementsByClassName('back-button')[0];
+    let strtbtn = document.getElementsByClassName('start-button')[0];
+    backbtn.addEventListener('click', goBack);
+    strtbtn.addEventListener('click', startGame);
   </script>
+
   <!-- Welcome Screen -->
   <div id="welcome-screen" class="page">
     <div class="background"></div>
@@ -51,6 +49,9 @@
         <!-- Cards will be dynamically populated -->
       </div>
       <div id="visualization-panel" class="visualization-panel hidden">
+        <div id="confirm-container" class="hidden">
+          <button id="confirm-button" class="confirm-btn">✓ Confirm This Profile</button>
+        </div>
         <h2 class="viz-title" id="viz-title">SELECT A CAREER TO EXPLORE</h2>
         <div class="viz-container">
           <div class="chart-area">
@@ -81,8 +82,42 @@
       </div>
     </div>
   </div>
-  <div id="user-profile">
 
+  <!-- Empty user-profile div if needed -->
+  <div id="user-profile"></div>
+
+  <!-- Risk Background Panels Page -->
+  <div id="risk-panels-screen" class="page hidden">
+    <div class="container">
+      <h1 class="page-title">Understanding Student Depression Risks</h1>
+
+      <section id="risk-panel-1" class="info-panel">
+        <h2>Sleep Duration & Depression Risk</h2>
+        <p>
+          Students who sleep fewer than 6 hours per night are <strong>more than twice as likely</strong> to experience depression compared to those who sleep 7–8 hours.
+          <br><br><strong>Depression Rate by Sleep Duration:</strong>
+          <ul>
+            <li><strong>Less than 6 hours:</strong> 63%</li>
+            <li><strong>7–8 hours:</strong> 28%</li>
+          </ul>
+        </p>
+        <div id="sleep-risk-chart"></div>
+      </section>
+
+      <section id="risk-panel-2" class="info-panel">
+        <h2>Work/Study Hours & Depression Risk</h2>
+        <p>
+          Students who reported experiencing depression spend <strong>over 1.5 hours more</strong> per day working or studying compared to their non-depressed peers.
+          <br><br><strong>Average Daily Work/Study Time:</strong>
+          <ul>
+            <li><strong>With Depression:</strong> 7.81 hours/day</li>
+            <li><strong>Without Depression:</strong> 6.24 hours/day</li>
+          </ul>
+        </p>
+        <div id="work-risk-chart"></div>
+      </section>
+    </div>
   </div>
+
 </body>
 </html>
