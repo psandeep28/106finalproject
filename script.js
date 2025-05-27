@@ -33,83 +33,167 @@ function updateInfoPanel(data) {
   document.getElementById("sleep-bar").style.width = data.sleepScore + "%";
   document.getElementById("sleep-text").textContent = `Average Sleep: ${data.avgSleep}`;
   document.getElementById("stress-bar").style.width = (data.stressLevel * 100) + "%";
-  document.getElementById("stress-text").textContent = `Stress Level: ${(data.stressLevel * 5).toFixed(2)}/5`;  
+  document.getElementById("stress-text").textContent = `Stress Level: ${(data.stressLevel * 5).toFixed(1)}/5`;
   document.getElementById("insights-text").textContent = data.insights;
 }
 
 function createRadarChart(data) {
-  const container = d3.select("#chart-container");
-  container.selectAll("*").remove();
-  const width = 400;
-  const height = 400;
-  const radius = Math.min(width, height) / 2 - 40;
-  const svg = container.append("svg").attr("width", width).attr("height", height);
-  const g = svg.append("g").attr("transform", `translate(${width/2}, ${height/2})`);
-
-  const angleScale = d3.scaleLinear().domain([0, data.detailData.length]).range([0, 2 * Math.PI]);
-  const radiusScale = d3.scaleLinear().domain([0, 100]).range([0, radius]);
-
-  for (let i = 1; i <= 5; i++) {
-    g.append("circle")
-      .attr("r", (radius / 5) * i)
-      .attr("fill", "none")
-      .attr("stroke", "#00ff00")
-      .attr("stroke-opacity", 0.3)
-      .attr("stroke-width", 1);
+    const container = d3.select("#chart-container");
+    container.selectAll("*").remove();
+  
+    const width = 400;
+    const height = 400;
+    const radius = Math.min(width, height) / 2 - 40;
+  
+    const svg = container.append("svg")
+      .attr("width", width)
+      .attr("height", height);
+  
+    const g = svg.append("g")
+      .attr("transform", `translate(${width / 2}, ${height / 2})`);
+  
+    const angleScale = d3.scaleLinear()
+      .domain([0, data.detailData.length])
+      .range([0, 2 * Math.PI]);
+  
+    const radiusScale = d3.scaleLinear()
+      .domain([0, 100])
+      .range([0, radius]);
+  
+    // Grid circles
+    for (let i = 1; i <= 5; i++) {
+      g.append("circle")
+        .attr("r", (radius / 5) * i)
+        .attr("fill", "none")
+        .attr("stroke", "#00ff00")
+        .attr("stroke-opacity", 0.3)
+        .attr("stroke-width", 1);
+    }
+  
+    // Axis lines and labels
+    data.detailData.forEach((d, i) => {
+      const angle = angleScale(i) - Math.PI / 2;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+  
+      g.append("line")
+        .attr("x1", 0).attr("y1", 0)
+        .attr("x2", x).attr("y2", y)
+        .attr("stroke", "#00ff00")
+        .attr("stroke-opacity", 0.5)
+        .attr("stroke-width", 1);
+  
+      g.append("text")
+        .attr("x", Math.cos(angle) * (radius + 20))
+        .attr("y", Math.sin(angle) * (radius + 20))
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .attr("fill", "#00ffff")
+        .attr("font-family", "Orbitron")
+        .attr("font-size", "10px")
+        .text(d.factor);
+    });
+  
+    // Area path
+    const area = d3.areaRadial()
+      .angle((d, i) => angleScale(i))
+      .innerRadius(0)
+      .outerRadius(d => radiusScale(d.value))
+      .curve(d3.curveLinearClosed);
+  
+    const radarPath = g.append("path")
+      .datum(data.detailData)
+      .attr("fill", "#ff00ff")
+      .attr("fill-opacity", 0.2)
+      .attr("stroke", "#ff00ff")
+      .attr("stroke-width", 2)
+      .attr("d", area)
+      .attr("stroke-dasharray", function() {
+        const totalLength = this.getTotalLength();
+        return `${totalLength} ${totalLength}`;
+      })
+      .attr("stroke-dashoffset", function() {
+        return this.getTotalLength();
+      })
+      .transition()
+      .duration(1200)
+      .ease(d3.easeCubicInOut)
+      .attr("stroke-dashoffset", 0);
+  
+    // Tooltip logic
+    let locked = false;
+    let tooltip = d3.select("body").select(".tooltip");
+    if (tooltip.empty()) {
+      tooltip = d3.select("body")
+        .append("div")
+        .attr("class", "tooltip")
+        .style("position", "absolute")
+        .style("background", "#000")
+        .style("color", "#0f0")
+        .style("padding", "8px")
+        .style("border", "1px solid #0f0")
+        .style("border-radius", "4px")
+        .style("font-family", "Orbitron")
+        .style("font-size", "12px")
+        .style("pointer-events", "none")
+        .style("opacity", 0);
+    }
+  
+    // Data points with hover + click-to-lock
+    g.selectAll(".data-point")
+      .data(data.detailData)
+      .enter()
+      .append("circle")
+      .attr("class", "data-point")
+      .attr("cx", (d, i) => Math.cos(angleScale(i) - Math.PI / 2) * radiusScale(d.value))
+      .attr("cy", (d, i) => Math.sin(angleScale(i) - Math.PI / 2) * radiusScale(d.value))
+      .attr("r", 4)
+      .attr("fill", "#ffff00")
+      .attr("stroke", "#ff00ff")
+      .attr("stroke-width", 2)
+      .style("cursor", "pointer")
+      .on("mouseover", function(event, d) {
+        if (locked) return;
+        d3.select(this).transition().duration(150).attr("r", 7);
+        tooltip.html(`${d.factor}: ${d.value}%`)
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 30 + "px")
+          .style("opacity", 1);
+      })
+      .on("mouseout", function() {
+        if (locked) return;
+        d3.select(this).transition().duration(150).attr("r", 4);
+        tooltip.style("opacity", 0);
+      })
+      .on("click", function(event, d) {
+        locked = !locked;
+        if (locked) {
+          d3.selectAll(".data-point").attr("r", 4);
+          d3.select(this).attr("r", 7);
+          tooltip.html(`${d.factor}: ${d.value}%`)
+            .style("left", event.pageX + 10 + "px")
+            .style("top", event.pageY - 30 + "px")
+            .style("opacity", 1);
+        } else {
+          tooltip.style("opacity", 0);
+          d3.select(this).transition().duration(150).attr("r", 4);
+        }
+      });
+  
+    // Optional: Add mini legend below
+    container.append("div")
+      .attr("class", "legend")
+      .style("margin-top", "10px")
+      .style("font-family", "Orbitron")
+      .style("color", "#00ffff")
+      .style("font-size", "12px")
+      .html(`
+        <strong>Legend:</strong>
+        <span style="color:#ffff00;">●</span> Metric point &nbsp;&nbsp;
+        <span style="color:#ff00ff;">▰</span> Risk polygon
+      `);
   }
-
-  data.detailData.forEach((d, i) => {
-    const angle = angleScale(i) - Math.PI / 2;
-    g.append("line")
-      .attr("x1", 0)
-      .attr("y1", 0)
-      .attr("x2", Math.cos(angle) * radius)
-      .attr("y2", Math.sin(angle) * radius)
-      .attr("stroke", "#00ff00")
-      .attr("stroke-opacity", 0.5)
-      .attr("stroke-width", 1);
-
-    g.append("text")
-      .attr("x", Math.cos(angle) * (radius + 20))
-      .attr("y", Math.sin(angle) * (radius + 20))
-      .attr("text-anchor", "middle")
-      .attr("dominant-baseline", "middle")
-      .attr("fill", "#00ffff")
-      .attr("font-family", "Orbitron")
-      .attr("font-size", "10px")
-      .text(d.factor);
-  });
-
-  const area = d3.areaRadial()
-    .angle((d, i) => angleScale(i))
-    .innerRadius(0)
-    .outerRadius(d => radiusScale(d.value))
-    .curve(d3.curveLinearClosed);
-
-  g.append("path")
-    .datum(data.detailData)
-    .attr("d", area)
-    .attr("fill", "#ff00ff")
-    .attr("fill-opacity", 0.2)
-    .attr("stroke", "#ff00ff")
-    .attr("stroke-width", 2);
-
-  g.selectAll(".data-point")
-    .data(data.detailData)
-    .enter()
-    .append("circle")
-    .attr("class", "data-point")
-    .attr("cx", (d, i) => Math.cos(angleScale(i) - Math.PI / 2) * radiusScale(d.value))
-    .attr("cy", (d, i) => Math.sin(angleScale(i) - Math.PI / 2) * radiusScale(d.value))
-    .attr("r", 0)
-    .attr("fill", "#ffff00")
-    .attr("stroke", "#ff00ff")
-    .attr("stroke-width", 2)
-    .transition()
-    .duration(1000)
-    .delay((d, i) => i * 100)
-    .attr("r", 4);
-}
+  
 
 // Load data from CSV on page load
 window.onload = () => {
