@@ -1,3 +1,6 @@
+export { createRadarChart, startGame, goBack };
+
+
 let careerData = {};
 
 function startGame() {
@@ -37,10 +40,10 @@ function updateInfoPanel(data) {
   document.getElementById("insights-text").textContent = data.insights;
 }
 
-function createRadarChart(data) {
-    const container = d3.select("#chart-container");
+function createRadarChart(data, containId='#chart-container') {
+    const container = d3.select(containId);
     container.selectAll("*").remove();
-  
+
     const width = 400;
     const height = 400;
     const radius = Math.min(width, height) / 2 - 40;

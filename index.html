@@ -7,8 +7,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script type='module' src='./user-ineract.js'></script>
+  <script type='module' src="./script.js"></script>
 </head>
 <body>
+  <!-- Load functions from the modules for use in the interactive elements
+       (if you update this, add the export to the module you are using
+       and then import whatever code you need here)
+  -->
+  <script type='module'>
+   import { startGame, goBack } from './script.js';
+   let backbtn = document.getElementsByClassName('back-button')[0];
+   let strtbtn = document.getElementsByClassName('start-button')[0];
+   backbtn.addEventListener('click', goBack);
+   strtbtn.addEventListener('click', startGame);
+  </script>
   <!-- Welcome Screen -->
   <div id="welcome-screen" class="page">
     <div class="background"></div>
@@ -21,14 +34,14 @@
         <p>Explore how different factors like <span class="highlight">sleep patterns</span>, <span class="highlight">academic pressure</span>, and <span class="highlight">financial stress</span> influence depression risk across career fields.</p>
         <p>Navigate through data-driven visualizations to discover insights that can help guide students toward healthier paths.</p>
       </div>
-      <button class="start-button" onclick="startGame()">► START EXPLORATION</button>
+      <button class="start-button">► START EXPLORATION</button>
     </div>
     <div class="credits">Data Visualization Project | DSC 106 Final</div>
   </div>
 
   <!-- Profiles Page -->
   <div id="profiles-screen" class="page hidden">
-    <button class="back-button" onclick="goBack()">← BACK</button>
+    <button class="back-button">← BACK</button>
     <div class="container">
       <div class="header">
         <h1 class="page-title">CAREER PROFILE ANALYSIS</h1>
@@ -68,7 +81,8 @@
       </div>
     </div>
   </div>
+  <div id="user-profile">
 
-  <script src="script.js"></script>
+  </div>
 </body>
 </html>
