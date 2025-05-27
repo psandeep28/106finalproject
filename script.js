@@ -221,8 +221,8 @@ window.onload = () => {
         <div class="career-stats">
           <div class="stat"><div class="stat-label">Depression Rate</div><div class="stat-value depression-rate">${(d.depressionRate*100).toFixed(0)}%</div></div>
           <div class="stat"><div class="stat-label">Avg Sleep</div><div class="stat-value sleep-duration">${d.avgSleep}</div></div>
-          <div class="stat"><div class="stat-label">Stress Level</div><div class="stat-value stress-level">${d.stressLevel}/5</div></div>
-        </div>
+          <div class="stat"><div class="stat-label">Stress Level</div><div class="stat-value stress-level">${(d.stressLevel * 5).toFixed(1)}/5</div></div>
+          </div>
       `;
       card.onclick = () => selectCareer(key);
       grid.appendChild(card);
