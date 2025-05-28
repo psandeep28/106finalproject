@@ -208,8 +208,6 @@ function createRadarChart(data, containId='#chart-container') {
       `);
   }
 
-<<<<<<< HEAD
-=======
   function renderSleepRiskChart() {
     const data = [
       { sleep: "Less than 5 hours", rate: 64.5 },
@@ -285,7 +283,6 @@ function createRadarChart(data, containId='#chart-container') {
   }
   
   
->>>>>>> origin/main
 
 // Load data from CSV on page load
 window.onload = () => {

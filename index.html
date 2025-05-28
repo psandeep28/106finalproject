@@ -16,6 +16,7 @@
     import { startGame, goBack } from './script.js';
     let backbtn = document.getElementsByClassName('back-button')[0];
     let strtbtn = document.getElementsByClassName('start-button')[0];
+    console.log(strtbtn);
     backbtn.addEventListener('click', goBack);
     strtbtn.addEventListener('click', startGame);
   </script>
@@ -31,6 +32,8 @@
         <p>Welcome to an interactive journey through the complex world of student mental health and career choices.</p>
         <p>Explore how different factors like <span class="highlight">sleep patterns</span>, <span class="highlight">academic pressure</span>, and <span class="highlight">financial stress</span> influence depression risk across career fields.</p>
         <p>Navigate through data-driven visualizations to discover insights that can help guide students toward healthier paths.</p>
+      </div>
+      <button class="start-button">► START EXPLORATION</button>
       </div>
       <div class="credits">Data Visualization Project | DSC 106 Final</div>
     </div>
