@@ -461,3 +461,115 @@ body::before {
         font-size: 2rem;
     }
 }
+
+/* Panel container style */
+.info-panel {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #00ffff;
+    border-radius: 10px;
+    margin: 20px auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 800px;
+    font-family: 'Orbitron', sans-serif;
+    color: #00ffff;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.6s ease-in;
+  }
+  
+  /* When panel becomes visible */
+  .info-panel:not(.hidden) {
+    opacity: 1;
+  }
+  
+  /* Headings */
+  .info-panel h2 {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+    color: #ff00ff;
+    text-shadow: 0 0 5px #ff00ff;
+  }
+  
+  /* Paragraph text and lists */
+  .info-panel p,
+  .info-panel ul {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #00ffff;
+  }
+  
+  /* List styling */
+  .info-panel ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+  }
+  
+  .info-panel li {
+    margin: 6px 0;
+    font-weight: 500;
+    color: #ffff00;
+  }
+  
+  /* Chart containers */
+  #sleep-risk-chart,
+  #work-risk-chart {
+    margin-top: 20px;
+  }
+
+  .axis text {
+    font-family: 'Orbitron', sans-serif;
+    fill: #00ffff;
+    font-size: 12px;
+  }
+  
+  .axis line,
+  .axis path {
+    stroke: #00ffff;
+    shape-rendering: crispEdges;
+  }
+  
+  .bar {
+    fill: #ff00ff;
+  }
+  
+  .bar-label {
+    fill: #ffff00;
+    font-size: 11px;
+    font-family: 'Orbitron', sans-serif;
+    text-anchor: middle;
+  }
+
+  .confirm-btn {
+    background-color: #00ff00;
+    color: #000;
+    font-family: 'Orbitron';
+    padding: 12px 24px;
+    border: 2px solid #00ff00;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.3s;
+  }
+  
+  .confirm-btn:hover {
+    background-color: #00cc00;
+  }
+  
+  #confirm-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .page {
+    transition: opacity 0.6s ease;
+  }
+  
+  .page.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  

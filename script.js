@@ -17,20 +17,29 @@ function goBack() {
 }
 
 function selectCareer(career) {
-  document.querySelectorAll(".career-card").forEach(card => card.classList.remove("active"));
-  document.querySelector(`[data-career="${career}"]`).classList.add("active");
-  showVisualization(career);
-}
+    document.querySelectorAll(".career-card").forEach(card => card.classList.remove("active"));
+    document.querySelector(`[data-career="${career}"]`).classList.add("active");
+    showVisualization(career);
+  }
 
-function showVisualization(career) {
-  const data = careerData[career];
-  const panel = document.getElementById("visualization-panel");
-  panel.classList.remove("hidden");
-  document.getElementById("viz-title").textContent = `${data.name.toUpperCase()} - DETAILED ANALYSIS`;
-  updateInfoPanel(data);
-  createRadarChart(data);
-  panel.scrollIntoView({ behavior: "smooth" });
-}
+  function showVisualization(career) {
+    const data = careerData[career];
+    const panel = document.getElementById("visualization-panel");
+    panel.classList.remove("hidden");
+  
+    document.getElementById("viz-title").textContent = `${data.name.toUpperCase()} - DETAILED ANALYSIS`;
+    updateInfoPanel(data);
+    createRadarChart(data);
+  
+    // Show confirm button
+    document.getElementById("confirm-container").classList.remove("hidden");
+  
+    panel.scrollIntoView({ behavior: "smooth" });
+  
+    // Save selected career if needed for later use
+    window.selectedCareer = career;
+  }
+  
 
 function updateInfoPanel(data) {
   document.getElementById("depression-bar").style.width = (data.depressionRate * 100) + "%";
@@ -199,6 +208,84 @@ function createRadarChart(data, containId='#chart-container') {
       `);
   }
 
+<<<<<<< HEAD
+=======
+  function renderSleepRiskChart() {
+    const data = [
+      { sleep: "Less than 5 hours", rate: 64.5 },
+      { sleep: "5–6 hours", rate: 56.9 },
+      { sleep: "7–8 hours", rate: 59.5 },
+      { sleep: "More than 8 hours", rate: 50.9 }
+    ];
+  
+    const svg = d3.select("#sleep-risk-chart").append("svg")
+      .attr("width", 400).attr("height", 300);
+  
+    const x = d3.scaleBand()
+      .domain(data.map(d => d.sleep))
+      .range([40, 360])
+      .padding(0.2);
+  
+    const y = d3.scaleLinear()
+      .domain([0, 100])
+      .range([250, 40]);
+  
+    svg.append("g")
+      .attr("transform", "translate(0,250)")
+      .call(d3.axisBottom(x));
+  
+    svg.append("g")
+      .attr("transform", "translate(40,0)")
+      .call(d3.axisLeft(y));
+  
+    svg.selectAll("rect")
+      .data(data)
+      .enter().append("rect")
+      .attr("x", d => x(d.sleep))
+      .attr("y", d => y(d.rate))
+      .attr("width", x.bandwidth())
+      .attr("height", d => 250 - y(d.rate))
+      .attr("fill", "#00ffff");
+  }
+  
+  function renderWorkRiskChart() {
+    const data = [
+      { group: "With Depression", hours: 7.81 },
+      { group: "Without Depression", hours: 6.24 }
+    ];
+  
+    const svg = d3.select("#work-risk-chart").append("svg")
+      .attr("width", 400).attr("height", 300);
+  
+    const x = d3.scaleBand()
+      .domain(data.map(d => d.group))
+      .range([60, 340])
+      .padding(0.3);
+  
+    const y = d3.scaleLinear()
+      .domain([0, 10])
+      .range([250, 40]);
+  
+    svg.append("g")
+      .attr("transform", "translate(0,250)")
+      .call(d3.axisBottom(x));
+  
+    svg.append("g")
+      .attr("transform", "translate(60,0)")
+      .call(d3.axisLeft(y));
+  
+    svg.selectAll("rect")
+      .data(data)
+      .enter().append("rect")
+      .attr("x", d => x(d.group))
+      .attr("y", d => y(d.hours))
+      .attr("width", x.bandwidth())
+      .attr("height", d => 250 - y(d.hours))
+      .attr("fill", "#ff00ff");
+  }
+  
+  
+>>>>>>> origin/main
 
 // Load data from CSV on page load
 window.onload = () => {
@@ -233,6 +320,18 @@ window.onload = () => {
       grid.appendChild(card);
     });
   });
+  const confirmButton = document.getElementById("confirm-button");
+  if (confirmButton) {
+    confirmButton.addEventListener("click", () => {
+      document.getElementById("profiles-screen").classList.add("hidden");
+      document.getElementById("confirm-container").classList.add("hidden");
+      document.getElementById("risk-panels-screen").classList.remove("hidden");
+      d3.select("#sleep-risk-chart").selectAll("*").remove();
+      d3.select("#work-risk-chart").selectAll("*").remove();
+      renderSleepRiskChart();
+      renderWorkRiskChart();
+    });
+  }
 };
 
 function getRiskClass(rate) {
@@ -241,3 +340,19 @@ function getRiskClass(rate) {
   if (rate >= 0.35) return "risk-medium";
   return "risk-low";
 }
+
+document.getElementById("confirm-button").addEventListener("click", () => {
+    // Hide profile screen and confirm button
+    document.getElementById("profiles-screen").classList.add("hidden");
+    document.getElementById("confirm-container").classList.add("hidden");
+  
+    // Show the risk panel page
+    document.getElementById("risk-panels-screen").classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  
+    // Trigger the D3 charts
+    renderSleepRiskChart();
+    renderWorkRiskChart();
+  });
+  
