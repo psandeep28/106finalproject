@@ -6,14 +6,14 @@ let careerData = {};
 function startGame() {
   document.getElementById("welcome-screen").classList.add("hidden");
   document.getElementById("profiles-screen").classList.remove("hidden");
-  document.getElementById('user-interaction').classList.remove('hidden');
+  document.getElementById('user-profile').classList.remove('hidden');
 }
 
 function goBack() {
   document.getElementById("profiles-screen").classList.add("hidden");
   document.getElementById("welcome-screen").classList.remove("hidden");
   document.getElementById("visualization-panel").classList.add("hidden");
-  document.getElementById('user-interaction').classList.add('hidden');
+  document.getElementById('user-profile').classList.add('hidden');
 }
 
 function selectCareer(career) {
@@ -26,20 +26,20 @@ function selectCareer(career) {
     const data = careerData[career];
     const panel = document.getElementById("visualization-panel");
     panel.classList.remove("hidden");
-  
+
     document.getElementById("viz-title").textContent = `${data.name.toUpperCase()} - DETAILED ANALYSIS`;
     updateInfoPanel(data);
     createRadarChart(data);
-  
+
     // Show confirm button
     document.getElementById("confirm-container").classList.remove("hidden");
-  
+
     panel.scrollIntoView({ behavior: "smooth" });
-  
+
     // Save selected career if needed for later use
     window.selectedCareer = career;
   }
-  
+
 
 function updateInfoPanel(data) {
   document.getElementById("depression-bar").style.width = (data.depressionRate * 100) + "%";
@@ -215,27 +215,27 @@ function createRadarChart(data, containId='#chart-container') {
       { sleep: "7–8 hours", rate: 59.5 },
       { sleep: "More than 8 hours", rate: 50.9 }
     ];
-  
+
     const svg = d3.select("#sleep-risk-chart").append("svg")
       .attr("width", 400).attr("height", 300);
-  
+
     const x = d3.scaleBand()
       .domain(data.map(d => d.sleep))
       .range([40, 360])
       .padding(0.2);
-  
+
     const y = d3.scaleLinear()
       .domain([0, 100])
       .range([250, 40]);
-  
+
     svg.append("g")
       .attr("transform", "translate(0,250)")
       .call(d3.axisBottom(x));
-  
+
     svg.append("g")
       .attr("transform", "translate(40,0)")
       .call(d3.axisLeft(y));
-  
+
     svg.selectAll("rect")
       .data(data)
       .enter().append("rect")
@@ -245,33 +245,33 @@ function createRadarChart(data, containId='#chart-container') {
       .attr("height", d => 250 - y(d.rate))
       .attr("fill", "#00ffff");
   }
-  
+
   function renderWorkRiskChart() {
     const data = [
       { group: "With Depression", hours: 7.81 },
       { group: "Without Depression", hours: 6.24 }
     ];
-  
+
     const svg = d3.select("#work-risk-chart").append("svg")
       .attr("width", 400).attr("height", 300);
-  
+
     const x = d3.scaleBand()
       .domain(data.map(d => d.group))
       .range([60, 340])
       .padding(0.3);
-  
+
     const y = d3.scaleLinear()
       .domain([0, 10])
       .range([250, 40]);
-  
+
     svg.append("g")
       .attr("transform", "translate(0,250)")
       .call(d3.axisBottom(x));
-  
+
     svg.append("g")
       .attr("transform", "translate(60,0)")
       .call(d3.axisLeft(y));
-  
+
     svg.selectAll("rect")
       .data(data)
       .enter().append("rect")
@@ -281,8 +281,8 @@ function createRadarChart(data, containId='#chart-container') {
       .attr("height", d => 250 - y(d.hours))
       .attr("fill", "#ff00ff");
   }
-  
-  
+
+
 
 // Load data from CSV on page load
 window.onload = () => {
@@ -342,14 +342,13 @@ document.getElementById("confirm-button").addEventListener("click", () => {
     // Hide profile screen and confirm button
     document.getElementById("profiles-screen").classList.add("hidden");
     document.getElementById("confirm-container").classList.add("hidden");
-  
+
     // Show the risk panel page
     document.getElementById("risk-panels-screen").classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  
+
     // Trigger the D3 charts
     renderSleepRiskChart();
     renderWorkRiskChart();
   });
-  

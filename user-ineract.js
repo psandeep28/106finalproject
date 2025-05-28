@@ -23,5 +23,5 @@ function addSliderValues() {
 }
 
 
-createRadarChart(testData, '#user-profile');
+createRadarChart(testData, '#user-chart');
 addSliderValues();
