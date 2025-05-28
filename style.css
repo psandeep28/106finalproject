@@ -571,5 +571,23 @@ body::before {
     opacity: 0;
     pointer-events: none;
   }
+
+  .next-button {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    background-color: #00ffcc;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    margin: 20px auto;
+    display: block;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .next-button:hover {
+    background-color: #00ccaa;
+  }
   
   

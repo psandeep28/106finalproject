@@ -6,7 +6,7 @@ let careerData = {};
 function startGame() {
   document.getElementById("welcome-screen").classList.add("hidden");
   document.getElementById("profiles-screen").classList.remove("hidden");
-  document.getElementById('user-profile').classList.remove('hidden');
+  document.getElementById('user-profile').classList.add('hidden');
 }
 
 function goBack() {
@@ -351,4 +351,26 @@ document.getElementById("confirm-button").addEventListener("click", () => {
     // Trigger the D3 charts
     renderSleepRiskChart();
     renderWorkRiskChart();
+  });
+
+  document.getElementById("next-to-user").addEventListener("click", () => {
+    document.getElementById("risk-panels-screen").classList.add("hidden");
+    document.getElementById("user-profile").classList.remove("hidden");
+  
+    // Optionally scroll into view
+    document.getElementById("user-profile").scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const nextBtn = document.getElementById("next-to-user");
+    const userProfile = document.getElementById("user-profile");
+    const riskPanels = document.getElementById("risk-panels-screen");
+
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        riskPanels.classList.add("hidden");
+        userProfile.classList.remove("hidden");
+        userProfile.scrollIntoView({ behavior: "smooth" });
+      });
+    }
   });
