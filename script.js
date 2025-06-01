@@ -6,7 +6,7 @@ let careerData = {};
 function startGame() {
   document.getElementById("welcome-screen").classList.add("hidden");
   document.getElementById("profiles-screen").classList.remove("hidden");
-  document.getElementById('user-profile').classList.add('hidden');
+  document.getElementById('user-profile').classList.remove('hidden');
 }
 
 function goBack() {

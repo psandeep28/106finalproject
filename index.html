@@ -1,151 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Career Path Chronicles</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-  <script type='module' src='./user-ineract.js'></script>
-  <script type='module' src="./script.js"></script>
-</head>
-<body>
-  <!-- Load functions from the modules for use in the interactive elements -->
-  <script type='module'>
-    import { startGame, goBack } from './script.js';
-    let backbtn = document.getElementsByClassName('back-button')[0];
-    let strtbtn = document.getElementsByClassName('start-button')[0];
-    console.log(strtbtn);
-    backbtn.addEventListener('click', goBack);
-    strtbtn.addEventListener('click', startGame);
-  </script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Career Path Chronicles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script type='module' src='./user-ineract.js'></script>
+    <script type='module' src="./script.js"></script>
+  </head>
+  <body>
+    <!-- Load functions from the modules for use in the interactive elements -->
+    <script type='module'>
+     import { startGame, goBack } from './script.js';
+     let backbtn = document.getElementsByClassName('back-button')[0];
+     let strtbtn = document.getElementsByClassName('start-button')[0];
+     console.log(strtbtn);
+     backbtn.addEventListener('click', goBack);
+     strtbtn.addEventListener('click', startGame);
+    </script>
 
-  <!-- Welcome Screen -->
-  <div id="welcome-screen" class="page">
-    <div class="background"></div>
-    <div class="scanlines"></div>
-    <div class="welcome-container">
-      <h1 class="game-title">CAREER PATH CHRONICLES</h1>
-      <h2 class="subtitle">Depression Risk Explorer<span class="cursor"></span></h2>
-      <div class="description">
-        <p>Welcome to an interactive journey through the complex world of student mental health and career choices.</p>
-        <p>Explore how different factors like <span class="highlight">sleep patterns</span>, <span class="highlight">academic pressure</span>, and <span class="highlight">financial stress</span> influence depression risk across career fields.</p>
-        <p>Navigate through data-driven visualizations to discover insights that can help guide students toward healthier paths.</p>
-      </div>
-      <button class="start-button">► START EXPLORATION</button>
+    <!-- Welcome Screen -->
+    <div id="welcome-screen" class="page">
+      <div class="background"></div>
+      <div class="scanlines"></div>
+      <div class="welcome-container">
+        <h1 class="game-title">CAREER PATH CHRONICLES</h1>
+        <h2 class="subtitle">Depression Risk Explorer<span class="cursor"></span></h2>
+        <div class="description">
+          <p>Welcome to an interactive journey through the complex world of student mental health and career choices.</p>
+          <p>Explore how different factors like <span class="highlight">sleep patterns</span>, <span class="highlight">academic pressure</span>, and <span class="highlight">financial stress</span> influence depression risk across career fields.</p>
+          <p>Navigate through data-driven visualizations to discover insights that can help guide students toward healthier paths.</p>
+        </div>
+        <button class="start-button">► START EXPLORATION</button>
       </div>
       <div class="credits">Data Visualization Project | DSC 106 Final</div>
     </div>
 
-  <!-- Profiles Page -->
-  <div id="profiles-screen" class="page hidden">
-    <button class="back-button">← BACK</button>
-    <div class="container">
-      <div class="header">
-        <h1 class="page-title">CAREER PROFILE ANALYSIS</h1>
-        <p class="instruction">Click on a career field to explore depression risk and wellbeing stats</p>
-      </div>
-      <div class="career-grid">
-        <!-- Cards will be dynamically populated -->
-      </div>
-      <div id="visualization-panel" class="visualization-panel hidden">
-        <div id="confirm-container" class="hidden">
-          <button id="confirm-button" class="confirm-btn">✓ Confirm This Profile</button>
+    <!-- Profiles Page -->
+    <div id="profiles-screen" class="page hidden">
+      <button class="back-button">← BACK</button>
+      <div class="container">
+        <div class="header">
+          <h1 class="page-title">CAREER PROFILE ANALYSIS</h1>
+          <p class="instruction">Click on a career field to explore depression risk and wellbeing stats</p>
         </div>
-  
-        <h2 class="viz-title" id="viz-title">SELECT A CAREER TO EXPLORE</h2>
-        <div class="viz-container">
-          <div class="chart-area">
-            <div id="chart-container"></div>
+        <div class="career-grid">
+          <!-- Cards will be dynamically populated -->
+        </div>
+        <div id="visualization-panel" class="visualization-panel hidden">
+          <div id="confirm-container" class="hidden">
+            <button id="confirm-button" class="confirm-btn">✓ Confirm This Profile</button>
           </div>
-          <div class="info-panel">
-            <div class="info-section">
-              <h3>Risk Assessment</h3>
-              <div class="metric-bar"><div class="metric-fill depression-fill" id="depression-bar"></div></div>
-              <p id="depression-text">Depression Rate: --</p>
+
+          <h2 class="viz-title" id="viz-title">SELECT A CAREER TO EXPLORE</h2>
+          <div class="viz-container">
+            <div class="chart-area">
+              <div id="chart-container"></div>
             </div>
-            <div class="info-section">
-              <h3>Sleep Quality</h3>
-              <div class="metric-bar"><div class="metric-fill sleep-fill" id="sleep-bar"></div></div>
-              <p id="sleep-text">Average Sleep: --</p>
-            </div>
-            <div class="info-section">
-              <h3>Stress Levels</h3>
-              <div class="metric-bar"><div class="metric-fill stress-fill" id="stress-bar"></div></div>
-              <p id="stress-text">Stress Level: --</p>
-            </div>
-            <div class="info-section">
-              <h3>Key Insights</h3>
-              <p id="insights-text">Select a career field to see detailed analysis and patterns.</p>
+            <div class="info-panel">
+              <div class="info-section">
+                <h3>Risk Assessment</h3>
+                <div class="metric-bar"><div class="metric-fill depression-fill" id="depression-bar"></div></div>
+                <p id="depression-text">Depression Rate: --</p>
+              </div>
+              <div class="info-section">
+                <h3>Sleep Quality</h3>
+                <div class="metric-bar"><div class="metric-fill sleep-fill" id="sleep-bar"></div></div>
+                <p id="sleep-text">Average Sleep: --</p>
+              </div>
+              <div class="info-section">
+                <h3>Stress Levels</h3>
+                <div class="metric-bar"><div class="metric-fill stress-fill" id="stress-bar"></div></div>
+                <p id="stress-text">Stress Level: --</p>
+              </div>
+              <div class="info-section">
+                <h3>Key Insights</h3>
+                <p id="insights-text">Select a career field to see detailed analysis and patterns.</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  
+
     <div id="user-profile" class='hidden'>
-        <h2>How are you feeling?</h2>
-        <p class="instruction">Rate where you fall below to get a prediction of your major, and where your risk falls relative to the other majors</p>
+      <h2>How are you feeling?</h2>
+      <p class="instruction">Rate where you fall below to get a prediction of your major, and where your risk falls relative to the other majors</p>
       <div id="user-chart"></div>
       <div id="user-input">
-        <p>Academic Pressure:</p>
-        <input class='slider-input' id="ac-pressure" name="Academic Pressure" type="range" min=0 max=100 value="0"/>
-        <p>Financial Stress:</p>
-        <input class='slider-input' id="fin-stress" name="Financial Stress" type="range" min=0 max=100 value="0"/>
-        <p>Work-Life Balance:</p>
-        <input class='slider-input' id="wl-balance" name="Work-Life Balance" type="range" min=0 max=100 value="0"/>
-        <p>Social Support:</p>
-        <input class='slider-input' id="soc-supp" name="Social Support" type="range" min=0 max=100 value="0"/>
-        <p>Job Securiry:</p>
-        <input class='slider-input' id="job-sec" name="Job Security" type="range" min=0 max=100 value="0"/>
-        <p>Amount of Sleep per night</p>
-        <select id="sleep-amnt" name="Amount of Sleep">
-          <option value="5">Less than 5 Hours</option>
-          <option value="5-6">5-6 Hours</option>
-          <option value="7-8">7-8 Hours</option>
-          <option value="8">More than 8 Hours</option>
-          <!-- NOTE: the verbiage here could be a bit confusing (since the
-               range in meant to be inclusive), perhaps find something better? -->
-        </select>
+        <div class="userin">
+          <p>Academic Pressure:</p>
+          <input class='slider-input' id="ac-pressure" name="Academic Pressure" type="range" min=0 max=100 value="0"/>
+        </div>
+        <div class="userin">
+          <p>Financial Stress:</p>
+          <input class='slider-input' id="fin-stress" name="Financial Stress" type="range" min=0 max=100 value="0"/>
+        </div>
+        <div class="userin">
+          <p>Work-Life Balance:</p>
+          <input class='slider-input' id="wl-balance" name="Work-Life Balance" type="range" min=0 max=100 value="0"/>
+        </div>
+        <div class="userin">
+          <p>Social Support:</p>
+          <input class='slider-input' id="soc-supp" name="Social Support" type="range" min=0 max=100 value="0"/>
+        </div>
+        <div class="userin">
+          <p>Job Securiry:</p>
+          <input class='slider-input' id="job-sec" name="Job Security" type="range" min=0 max=100 value="0"/>
+        </div>
+        <div class="userin">
+          <p>Amount of Sleep per night</p>
+          <select id="sleep-amnt" name="Amount of Sleep">
+            <option value="5">Less than 5 Hours</option>
+            <option value="5-6">5-6 Hours</option>
+            <option value="7-8">7-8 Hours</option>
+            <option value="8">More than 8 Hours</option>
+            <!-- NOTE: the verbiage here could be a bit confusing (since the
+                 range in meant to be inclusive), perhaps find something better? -->
+          </select>
+        </div>
       </div>
     </div>
-  <!-- Risk Background Panels Page -->
-  <div id="risk-panels-screen" class="page hidden">
-    <div class="container">
-      <h1 class="page-title">Understanding Student Depression Risks</h1>
+    <!-- Risk Background Panels Page -->
+    <div id="risk-panels-screen" class="page hidden">
+      <div class="container">
+        <h1 class="page-title">Understanding Student Depression Risks</h1>
 
-      <section id="risk-panel-1" class="info-panel">
-        <h2>Sleep Duration & Depression Risk</h2>
-        <p>
-          Students who sleep fewer than 6 hours per night are <strong>more than twice as likely</strong> to experience depression compared to those who sleep 7–8 hours.
-          <br><br><strong>Depression Rate by Sleep Duration:</strong>
-          <ul>
-            <li><strong>Less than 6 hours:</strong> 63%</li>
-            <li><strong>7–8 hours:</strong> 28%</li>
-          </ul>
-        </p>
-        <div id="sleep-risk-chart"></div>
-      </section>
+        <section id="risk-panel-1" class="info-panel">
+          <h2>Sleep Duration & Depression Risk</h2>
+          <p>
+            Students who sleep fewer than 6 hours per night are <strong>more than twice as likely</strong> to experience depression compared to those who sleep 7–8 hours.
+            <br><br><strong>Depression Rate by Sleep Duration:</strong>
+            <ul>
+              <li><strong>Less than 6 hours:</strong> 63%</li>
+              <li><strong>7–8 hours:</strong> 28%</li>
+            </ul>
+          </p>
+          <div id="sleep-risk-chart"></div>
+        </section>
 
-      <section id="risk-panel-2" class="info-panel">
-        <h2>Work/Study Hours & Depression Risk</h2>
-        <p>
-          Students who reported experiencing depression spend <strong>over 1.5 hours more</strong> per day working or studying compared to their non-depressed peers.
-          <br><br><strong>Average Daily Work/Study Time:</strong>
-          <ul>
-            <li><strong>With Depression:</strong> 7.81 hours/day</li>
-            <li><strong>Without Depression:</strong> 6.24 hours/day</li>
-          </ul>
-        </p>
-        <div id="work-risk-chart"></div>
-      </section>
+        <section id="risk-panel-2" class="info-panel">
+          <h2>Work/Study Hours & Depression Risk</h2>
+          <p>
+            Students who reported experiencing depression spend <strong>over 1.5 hours more</strong> per day working or studying compared to their non-depressed peers.
+            <br><br><strong>Average Daily Work/Study Time:</strong>
+            <ul>
+              <li><strong>With Depression:</strong> 7.81 hours/day</li>
+              <li><strong>Without Depression:</strong> 6.24 hours/day</li>
+            </ul>
+          </p>
+          <div id="work-risk-chart"></div>
+        </section>
 
-      <div class="panel-next-button-container">
-        <button id="next-to-user" class="next-button">→ Start Your Journey</button>
+        <div class="panel-next-button-container">
+          <button id="next-to-user" class="next-button">→ Start Your Journey</button>
+        </div>
       </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>
