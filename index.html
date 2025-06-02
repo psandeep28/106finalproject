@@ -7,18 +7,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-    <script type='module' src='./user-ineract.js'></script>
-    <script type='module' src="./script.js"></script>
+    <script type="module" src="./user-ineract.js"></script>
+    <script type="module" src="./script.js"></script>
   </head>
   <body>
-    <!-- Load functions from the modules for use in the interactive elements -->
-    <script type='module'>
-     import { startGame, goBack } from './script.js';
-     let backbtn = document.getElementsByClassName('back-button')[0];
-     let strtbtn = document.getElementsByClassName('start-button')[0];
-     console.log(strtbtn);
-     backbtn.addEventListener('click', goBack);
-     strtbtn.addEventListener('click', startGame);
+    <script type="module">
+      import { startGame, goBack } from './script.js';
+      let backbtn = document.getElementsByClassName('back-button')[0];
+      let strtbtn = document.getElementsByClassName('start-button')[0];
+      console.log(strtbtn);
+      backbtn.addEventListener('click', goBack);
+      strtbtn.addEventListener('click', startGame);
     </script>
 
     <!-- Welcome Screen -->
@@ -85,7 +84,8 @@
       </div>
     </div>
 
-    <div id="user-profile" class='hidden'>
+    <!-- User Profile Input Page -->
+    <div id="user-profile" class="hidden">
       <h2>How are you feeling?</h2>
       <p class="instruction">Rate where you fall below to get a prediction of your major, and where your risk falls relative to the other majors</p>
       <div id="user-chart"></div>
@@ -121,16 +121,38 @@
           <p>Amount of Sleep per night</p>
           <select class='user-input drop-input' id="sleep-amnt" name="Amount of Sleep">
             <option value="5">Less than 5 Hours</option>
-            <option value="5-6">5-6 Hours</option>
-            <option value="7-8">7-8 Hours</option>
+            <option value="5-6">5–6 Hours</option>
+            <option value="7-8">7–8 Hours</option>
             <option value="8">More than 8 Hours</option>
-            <!-- NOTE: the verbiage here could be a bit confusing (since the
-                 range in meant to be inclusive), perhaps find something better? -->
           </select>
         </div>
       </div>
       <div id="user-sleep"></div>
     </div>
+
+    <!-- Timeline Screen for Business Profile -->
+    <div id="timeline-screen" class="page hidden">
+      <div class="container">
+        <h1>📈 Business Students: Stress & Depression Over Time</h1>
+        <p>This visualization explores how stress evolves with age for business students. It compares academic and financial stress scores,
+        tracks depression rates, and highlights periods of high total stress. Use the zoom tool below to focus on specific age ranges and hover for exact values.</p>
+        <div class="viz-flex-wrapper">
+            <div id="chart-wrapper">
+              <div id="chart"></div>
+            </div>
+            <div class="legend-box">
+              <div class="legend-item"><div class="legend-color" style="background:#00ffff;"></div>Academic Stress</div>
+              <div class="legend-item"><div class="legend-color" style="background:#ff00ff;"></div>Financial Stress</div>
+              <div class="legend-item"><div class="legend-color" style="background:#ffff00;"></div>Depression Rate</div>
+              <div class="legend-item"><div class="legend-color" style="background:red;"></div>High Total Stress</div>
+            </div>
+          </div>
+        <div class="panel-next-button-container">
+          <button id="next-to-risk" class="next-button">→ View Risk Insights</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Risk Background Panels Page -->
     <div id="risk-panels-screen" class="page hidden">
       <div class="container">
@@ -168,4 +190,5 @@
       </div>
     </div>
   </body>
+  <div class="tooltip" id="tooltip"></div>
 </html>

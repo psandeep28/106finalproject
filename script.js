@@ -19,7 +19,11 @@ function goBack() {
 function selectCareer(career) {
     document.querySelectorAll(".career-card").forEach(card => card.classList.remove("active"));
     document.querySelector(`[data-career="${career}"]`).classList.add("active");
-    showVisualization(career);
+  
+    // Save selected career globally
+    window.selectedCareer = career;
+  
+    showVisualization(career); // always show radar chart first
   }
 
   function showVisualization(career) {
@@ -40,6 +44,20 @@ function selectCareer(career) {
     window.selectedCareer = career;
   }
 
+  document.getElementById("next-to-risk").addEventListener("click", () => {
+    // 👇 HIDE TIMELINE
+    document.getElementById("timeline-screen").classList.add("hidden");
+  
+    // 👇 SHOW RISK PANELS
+    document.getElementById("risk-panels-screen").classList.remove("hidden");
+  
+    // 🧼 Clear & re-render risk visuals
+    d3.select("#sleep-risk-chart").selectAll("*").remove();
+    d3.select("#work-risk-chart").selectAll("*").remove();
+    renderSleepRiskChart();
+    renderWorkRiskChart();
+  });
+  
 
 function updateInfoPanel(data) {
   document.getElementById("depression-bar").style.width = (data.depressionRate * 100) + "%";
@@ -322,14 +340,176 @@ window.onload = () => {
     confirmButton.addEventListener("click", () => {
       document.getElementById("profiles-screen").classList.add("hidden");
       document.getElementById("confirm-container").classList.add("hidden");
-      document.getElementById("risk-panels-screen").classList.remove("hidden");
-      d3.select("#sleep-risk-chart").selectAll("*").remove();
-      d3.select("#work-risk-chart").selectAll("*").remove();
-      renderSleepRiskChart();
-      renderWorkRiskChart();
+      document.getElementById("visualization-panel").classList.add("hidden");
+  
+      if (window.selectedCareer.toLowerCase() === "business") {
+        document.getElementById("timeline-screen").classList.remove("hidden");
+        renderTimelineChart();
+      } else {
+        document.getElementById("risk-panels-screen").classList.remove("hidden");
+        d3.select("#sleep-risk-chart").selectAll("*").remove();
+        d3.select("#work-risk-chart").selectAll("*").remove();
+        renderSleepRiskChart();
+        renderWorkRiskChart();
+      }
+    });
+}
+};
+
+function renderTimelineChart() {
+    const margin = { top: 60, right: 70, bottom: 130, left: 60 },
+          width = 900,
+          height = 500,
+          height2 = 80;
+  
+    const svg = d3.select("#chart").html("").append("svg")
+      .attr("width", width)
+      .attr("height", height);
+  
+    const focus = svg.append("g");
+    const context = svg.append("g").attr("transform", `translate(0, ${height - height2 - 30})`);
+  
+    let tooltip = d3.select("#tooltip");
+    if (tooltip.empty()) {
+      tooltip = d3.select("body")
+        .append("div")
+        .attr("id", "tooltip")
+        .attr("class", "tooltip");
+    }
+  
+    d3.csv("data/business_stress_timeline.csv", d3.autoType).then(data => {
+      const x = d3.scaleLinear().domain(d3.extent(data, d => d.Age)).range([margin.left, width - margin.right]);
+      const x2 = x.copy();
+      const y = d3.scaleLinear().domain([0, 10]).range([height - margin.bottom, margin.top]);
+      const yR = d3.scaleLinear().domain([0, 1]).range([height - margin.bottom, margin.top]);
+      const yMini = d3.scaleLinear().domain(y.domain()).range([height2, 0]);
+  
+      const line = (key, xScale, yScale) =>
+        d3.line().x(d => xScale(d.Age)).y(d => yScale(d[key]));
+  
+      const drawFocus = () => {
+        focus.selectAll("*").remove();
+  
+        // X-Axis
+        focus.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x))
+        .append("text") // 👈 Axis label
+        .attr("x", (width / 2))
+        .attr("y", 40)
+        .attr("fill", "#ffff00")
+        .attr("text-anchor", "middle")
+        .attr("font-family", "Orbitron")
+        .attr("font-size", "14px")
+        .text("Age");
+
+        // Y-Left (Stress Score)
+        focus.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y))
+        .append("text") // 👈 Axis label
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -45)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#ffff00")
+        .attr("font-family", "Orbitron")
+        .attr("font-size", "14px")
+        .text("Stress Score");
+
+        // Y-Right (Depression Rate %)
+        focus.append("g")
+        .attr("transform", `translate(${width - margin.right},0)`)
+        .call(d3.axisRight(yR).tickFormat(d3.format(".0%")))
+        .append("text") // 👈 Axis label
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", 40)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#ffff00")
+        .attr("font-family", "Orbitron")
+        .attr("font-size", "14px")
+        .text("Depression Rate (%)");
+
+  
+        focus.append("g").attr("transform", `translate(${width - margin.right},0)`)
+          .call(d3.axisRight(yR).tickFormat(d3.format(".0%")))
+          .call(g => g.append("text")
+            .attr("class", "label")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -height / 2)
+            .attr("y", 20)
+            .attr("text-anchor", "middle")
+            .text("Depression Rate")
+          );
+
+        context.append("g")
+        .attr("transform", `translate(0,${height2})`)
+        .call(d3.axisBottom(x2))
+        .selectAll("text")
+        .style("font-size", "10px")
+        .style("fill", "#00ff00")
+        .style("font-family", "Orbitron");
+  
+        // Line Paths
+        focus.append("path").datum(data).attr("fill", "none").attr("stroke", "#00ffff").attr("stroke-width", 2).attr("d", line("Academic Pressure", x, y));
+        focus.append("path").datum(data).attr("fill", "none").attr("stroke", "#ff00ff").attr("stroke-width", 2).attr("d", line("Financial Stress", x, y));
+        focus.append("path").datum(data).attr("fill", "none").attr("stroke", "#ffff00").attr("stroke-width", 2).attr("stroke-dasharray", "4 2").attr("d", line("Depression", x, yR));
+  
+        // Dots
+        [["Academic Pressure", "#00ffff", y], ["Financial Stress", "#ff00ff", y], ["Depression", "#ffff00", yR]].forEach(([key, color, scale]) => {
+          focus.selectAll(`.dot-${key}`).data(data).enter().append("circle")
+            .attr("cx", d => x(d.Age))
+            .attr("cy", d => scale(d[key]))
+            .attr("r", 4)
+            .attr("fill", color)
+            .on("mouseover", (event, d) => {
+              tooltip
+                .html(`${key}<br>Age: ${d.Age}<br>Value: ${d[key].toFixed(2)}`)
+                .style("left", event.pageX + 10 + "px")
+                .style("top", event.pageY - 28 + "px")
+                .style("opacity", 1);
+            })
+            .on("mouseout", () => tooltip.style("opacity", 0));
+        });
+  
+        // High Stress Pulses
+        focus.selectAll(".pulse-dot").data(data.filter(d => d["High Stress Flag"])).enter().append("circle")
+          .attr("cx", d => x(d.Age))
+          .attr("cy", d => y(d["Total Stress"]))
+          .attr("r", 5)
+          .attr("fill", "red")
+          .attr("class", "pulse-dot")
+          .on("mouseover", (event, d) => {
+            tooltip
+              .html(`High Total Stress<br>Age: ${d.Age}<br>Total: ${d["Total Stress"].toFixed(2)}`)
+              .style("left", event.pageX + 10 + "px")
+              .style("top", event.pageY - 28 + "px")
+              .style("opacity", 1);
+          })
+          .on("mouseout", () => tooltip.style("opacity", 0));
+      };
+  
+      // Context (Mini) Chart & Brush
+      context.append("g").attr("transform", `translate(0,${height2})`).call(d3.axisBottom(x2));
+      context.append("path").datum(data).attr("fill", "none").attr("stroke", "#888").attr("stroke-width", 1).attr("d", line("Total Stress", x2, yMini));
+  
+      const brush = d3.brushX()
+        .extent([[margin.left, 0], [width - margin.right, height2]])
+        .on("brush end", (event) => {
+          const sel = event.selection;
+          if (sel) {
+            x.domain(sel.map(x2.invert, x2));
+            drawFocus();
+          }
+        });
+  
+      context.append("g").attr("class", "brush").call(brush);
+      drawFocus();
     });
   }
-};
+  
+
 
 function getRiskClass(rate) {
   if (rate >= 0.65) return "risk-critical";
@@ -339,19 +519,24 @@ function getRiskClass(rate) {
 }
 
 document.getElementById("confirm-button").addEventListener("click", () => {
-    // Hide profile screen and confirm button
     document.getElementById("profiles-screen").classList.add("hidden");
     document.getElementById("confirm-container").classList.add("hidden");
-
-    // Show the risk panel page
-    document.getElementById("risk-panels-screen").classList.remove("hidden");
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-
-    // Trigger the D3 charts
-    renderSleepRiskChart();
-    renderWorkRiskChart();
+  
+    if (window.selectedCareer.toLowerCase() === "business") {
+      // ✅ SHOW ONLY TIMELINE SCREEN
+      document.getElementById("timeline-screen").classList.remove("hidden");
+      renderTimelineChart();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      // Directly go to risk panels
+      document.getElementById("risk-panels-screen").classList.remove("hidden");
+      renderSleepRiskChart();
+      renderWorkRiskChart();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   });
+  
+  
 
   document.getElementById("next-to-user").addEventListener("click", () => {
     document.getElementById("risk-panels-screen").classList.add("hidden");
