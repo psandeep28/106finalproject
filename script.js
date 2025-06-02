@@ -300,7 +300,13 @@ function createRadarChart(data, containId='#chart-container') {
       .attr("fill", "#ff00ff");
   }
 
-
+  document.getElementById("next-from-engineering").addEventListener("click", () => {
+    document.getElementById("engineering-matrix-screen").classList.add("hidden");
+    document.getElementById("risk-panels-screen").classList.remove("hidden");
+    renderSleepRiskChart();
+    renderWorkRiskChart();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 
 // Load data from CSV on page load
 window.onload = () => {
@@ -338,21 +344,24 @@ window.onload = () => {
   const confirmButton = document.getElementById("confirm-button");
   if (confirmButton) {
     confirmButton.addEventListener("click", () => {
-      document.getElementById("profiles-screen").classList.add("hidden");
-      document.getElementById("confirm-container").classList.add("hidden");
-      document.getElementById("visualization-panel").classList.add("hidden");
-  
-      if (window.selectedCareer.toLowerCase() === "business") {
-        document.getElementById("timeline-screen").classList.remove("hidden");
-        renderTimelineChart();
-      } else {
-        document.getElementById("risk-panels-screen").classList.remove("hidden");
-        d3.select("#sleep-risk-chart").selectAll("*").remove();
-        d3.select("#work-risk-chart").selectAll("*").remove();
-        renderSleepRiskChart();
-        renderWorkRiskChart();
-      }
-    });
+        document.getElementById("profiles-screen").classList.add("hidden");
+        document.getElementById("confirm-container").classList.add("hidden");
+      
+        const selected = window.selectedCareer.toLowerCase();
+        if (selected === "business") {
+          document.getElementById("timeline-screen").classList.remove("hidden");
+          renderTimelineChart();
+        } else if (selected === "engineering") {
+          document.getElementById("engineering-matrix-screen").classList.remove("hidden");
+          renderEngineeringMatrix();
+        } else {
+          document.getElementById("risk-panels-screen").classList.remove("hidden");
+          renderSleepRiskChart();
+          renderWorkRiskChart();
+        }
+      
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });      
 }
 };
 
@@ -508,6 +517,83 @@ function renderTimelineChart() {
       drawFocus();
     });
   }
+
+  function renderEngineeringMatrix() {
+    const svg = d3.select("#engineering-matrix-svg");
+    svg.selectAll("*").remove();
+  
+    const margin = { top: 60, right: 30, bottom: 60, left: 130 },
+          width = 960 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
+  
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    const tooltip = d3.select("#engineering-tooltip");
+  
+    d3.csv("data/engineering_sleep_matrix.csv").then(data => {
+      data.forEach(d => {
+        d.Study = +d["Study Bin"];
+        d.Depression = +d["depression_rate"];
+        d.Students = +d["student_count"];
+        d.GPA = +d["avg_gpa"];
+      });
+  
+      const sleepCats = [...new Set(data.map(d => d["Sleep Duration"]))];
+      const x = d3.scaleLinear().domain([0, 15]).range([0, width]);
+      const y = d3.scaleBand().domain(sleepCats).range([height, 0]).padding(0.2);
+      const radius = d3.scaleSqrt().domain([1, d3.max(data, d => d.Students)]).range([3, 25]);
+      const color = d3.scaleSequential(d3.interpolateYlOrRd).domain([0, 1]);
+  
+      g.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(x))
+        .attr("color", "#00ff00");
+  
+      g.append("g")
+        .call(d3.axisLeft(y))
+        .attr("color", "#00ff00");
+
+  
+      g.append("text")
+        .attr("x", width / 2)
+        .attr("y", height + 40)
+        .attr("fill", "#ffff00")
+        .style("text-anchor", "middle")
+        .style("font-size", "14px")
+        .text("Study Hours Per Day");
+  
+      g.append("text")
+        .attr("x", -height / 2)
+        .attr("y", -60)
+        .attr("transform", "rotate(-90)")
+        .attr("fill", "#ffff00")
+        .style("text-anchor", "middle")
+        .style("font-size", "14px")
+        .text("Sleep Duration");
+  
+      g.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => x(d.Study))
+        .attr("cy", d => y(d["Sleep Duration"]) + y.bandwidth()/2)
+        .attr("r", d => radius(d.Students))
+        .attr("fill", d => color(d.Depression))
+        .attr("stroke", "#00ffff")
+        .attr("stroke-width", 1)
+        .on("mouseover", (event, d) => {
+          tooltip.style("opacity", 1)
+            .html(`<strong>${d["Sleep Duration"]}</strong><br>
+                   Study Hours: ${d.Study}<br>
+                   Depression Rate: ${(d.Depression * 100).toFixed(1)}%<br>
+                   GPA: ${d.GPA.toFixed(2)}<br>
+                   Students: ${d.Students}`)
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 40) + "px");
+        })
+        .on("mouseout", () => tooltip.style("opacity", 0));
+    });
+  }
+  
   
 
 
@@ -522,19 +608,23 @@ document.getElementById("confirm-button").addEventListener("click", () => {
     document.getElementById("profiles-screen").classList.add("hidden");
     document.getElementById("confirm-container").classList.add("hidden");
   
-    if (window.selectedCareer.toLowerCase() === "business") {
-      // ✅ SHOW ONLY TIMELINE SCREEN
+    const selected = window.selectedCareer.toLowerCase();
+  
+    if (selected === "business") {
       document.getElementById("timeline-screen").classList.remove("hidden");
       renderTimelineChart();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (selected === "engineering") {
+      document.getElementById("engineering-matrix-screen").classList.remove("hidden");
+      renderEngineeringMatrix();  // ✅ this is the new visual
     } else {
-      // Directly go to risk panels
       document.getElementById("risk-panels-screen").classList.remove("hidden");
       renderSleepRiskChart();
       renderWorkRiskChart();
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
+  
   
   
 
