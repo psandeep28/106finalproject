@@ -17,6 +17,8 @@ let userData = {
   ],
 };
 
+let bufferAcademic = 0;
+let bufferFin = 0;
 
 function addSliderValues() {
   let inputs = Array.from(document.getElementsByClassName('userin'));
@@ -34,10 +36,17 @@ function updateSliderValues() {
     let label = userInput.getElementsByClassName('value')[0];
     let dataName = slider.name;
     let dataPoint = userData.detailData.filter((f) => f.factor === dataName)[0];
-    dataPoint.value = slider.value;
+    if (dataName === 'Academic Pressure') {
+      bufferAcademic = Number(slider.value);
+    } else if (dataName === "Financial Stress") {
+      bufferFin = Number(slider.value);
+    }
+    dataPoint.value = Number(slider.value);
     label.innerHTML = slider.value;
   }
   createRadarChart(userData, '#user-chart');
+  userData.stressLevel = (bufferAcademic + bufferFin) / 2;
+  console.log(userData.stressLevel);
 }
 
 createRadarChart(userData, '#user-chart');
