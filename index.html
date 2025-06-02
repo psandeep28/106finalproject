@@ -90,29 +90,36 @@
       <p class="instruction">Rate where you fall below to get a prediction of your major, and where your risk falls relative to the other majors</p>
       <div id="user-chart"></div>
       <div id="user-input">
-        <div class="userin">
+        <!-- TODO: Rearange the order of this to be more intuitive for
+        a user looking at the chart -->
+        <div class="userin slider">
           <p>Academic Pressure:</p>
-          <input class='slider-input' id="ac-pressure" name="Academic Pressure" type="range" min=0 max=100 value="0"/>
+          <input class='user-input slider-input' id="ac-pressure" name="Academic Pressure" type="range" min=0 max=100 value="0"/>
+          <label class="value" for=""></label>
         </div>
-        <div class="userin">
+        <div class="userin slider">
           <p>Financial Stress:</p>
-          <input class='slider-input' id="fin-stress" name="Financial Stress" type="range" min=0 max=100 value="0"/>
+          <input class='user-input slider-input' id="fin-stress" name="Financial Stress" type="range" min=0 max=100 value="0"/>
+          <label class="value" for=""></label>
         </div>
-        <div class="userin">
+        <div class="userin slider">
           <p>Work-Life Balance:</p>
-          <input class='slider-input' id="wl-balance" name="Work-Life Balance" type="range" min=0 max=100 value="0"/>
+          <input class='user-input slider-input' id="wl-balance" name="Work-Life Balance" type="range" min=0 max=100 value="0"/>
+          <label class="value" for=""></label>
         </div>
-        <div class="userin">
+        <div class="userin slider">
           <p>Social Support:</p>
-          <input class='slider-input' id="soc-supp" name="Social Support" type="range" min=0 max=100 value="0"/>
+          <input class='user-input slider-input' id="soc-supp" name="Social Support" type="range" min=0 max=100 value="0"/>
+          <label class="value" for=""></label>
         </div>
-        <div class="userin">
+        <div class="userin slider">
           <p>Job Securiry:</p>
-          <input class='slider-input' id="job-sec" name="Job Security" type="range" min=0 max=100 value="0"/>
+          <input class='user-input slider-input' id="job-sec" name="Job Security" type="range" min=0 max=100 value="0"/>
+          <label class="value" for=""></label>
         </div>
         <div class="userin">
           <p>Amount of Sleep per night</p>
-          <select id="sleep-amnt" name="Amount of Sleep">
+          <select class='user-input drop-input' id="sleep-amnt" name="Amount of Sleep">
             <option value="5">Less than 5 Hours</option>
             <option value="5-6">5-6 Hours</option>
             <option value="7-8">7-8 Hours</option>
