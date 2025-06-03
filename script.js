@@ -54,7 +54,7 @@ function selectCareer(career) {
     // 🧼 Clear & re-render risk visuals
     d3.select("#sleep-risk-chart").selectAll("*").remove();
     d3.select("#work-risk-chart").selectAll("*").remove();
-    renderSleepRiskChart();
+    renderHeatmap();
     renderWorkRiskChart();
   });
   
@@ -226,43 +226,125 @@ function createRadarChart(data, containId='#chart-container') {
       `);
   }
 
-  function renderSleepRiskChart() {
-    const data = [
-      { sleep: "Less than 5 hours", rate: 64.5 },
-      { sleep: "5–6 hours", rate: 56.9 },
-      { sleep: "7–8 hours", rate: 59.5 },
-      { sleep: "More than 8 hours", rate: 50.9 }
-    ];
-
+  function renderHeatmap() {
+    d3.select("#sleep-risk-chart").selectAll("*").remove();
     const svg = d3.select("#sleep-risk-chart").append("svg")
-      .attr("width", 400).attr("height", 300);
-
-    const x = d3.scaleBand()
-      .domain(data.map(d => d.sleep))
-      .range([40, 360])
-      .padding(0.2);
-
-    const y = d3.scaleLinear()
-      .domain([0, 100])
-      .range([250, 40]);
-
-    svg.append("g")
-      .attr("transform", "translate(0,250)")
-      .call(d3.axisBottom(x));
-
-    svg.append("g")
-      .attr("transform", "translate(40,0)")
-      .call(d3.axisLeft(y));
-
-    svg.selectAll("rect")
-      .data(data)
-      .enter().append("rect")
-      .attr("x", d => x(d.sleep))
-      .attr("y", d => y(d.rate))
-      .attr("width", x.bandwidth())
-      .attr("height", d => 250 - y(d.rate))
-      .attr("fill", "#00ffff");
-  }
+      .attr("width", 750)
+      .attr("height", 420);
+  
+    const margin = { top: 40, right: 30, bottom: 60, left: 100 },
+          width = 750 - margin.left - margin.right,
+          height = 420 - margin.top - margin.bottom;
+  
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    const xLabels = ['Less than 5 hours', '5-6 hours', '7-8 hours', 'More than 8 hours'];
+    const yLabels = ['Arts', 'Business', 'Engineering', 'Medicine'];
+  
+    const x = d3.scaleBand().domain(xLabels).range([0, width]).padding(0.05);
+    const y = d3.scaleBand().domain(yLabels).range([0, height]).padding(0.05);
+    const color = d3.scaleSequential(d3.interpolateReds).domain([0.4, 0.7]);
+  
+    const tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("background", "rgba(0,0,0,0.9)")
+      .style("color", "#00ff00")
+      .style("padding", "10px")
+      .style("border", "1px solid #00ff00")
+      .style("border-radius", "6px")
+      .style("font-size", "13px")
+      .style("pointer-events", "none")
+      .style("opacity", 0)
+      .style("font-family", "Orbitron");
+  
+    d3.json("data/depression_heatmap_data_enhanced.json").then(data => {
+      g.selectAll(".cell")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "cell")
+        .attr("x", d => x(d.Sleep))
+        .attr("y", d => y(d.Profile))
+        .attr("width", x.bandwidth())
+        .attr("height", y.bandwidth())
+        .attr("fill", d => color(d.Rate))
+        .style("stroke", "#00ffff")
+        .style("stroke-width", 1)
+        .on("mouseover", function(event, d) {
+          d3.select(this).style("stroke-width", 3);
+          tooltip.html(`<strong>${d.Profile}</strong><br>${d.Sleep}<br><strong>Depression Rate:</strong> ${(d.Rate * 100).toFixed(1)}%<br><strong>Compared to Avg:</strong> ${(d.DeltaFromAvg > 0 ? '+' : '') + (d.DeltaFromAvg * 100).toFixed(1)}%`)
+            .style("opacity", 1);
+        })
+        .on("mousemove", event => {
+          tooltip.style("left", (event.pageX + 10) + "px")
+                 .style("top", (event.pageY - 30) + "px");
+        })
+        .on("mouseleave", function() {
+          d3.select(this).style("stroke-width", 1);
+          tooltip.style("opacity", 0);
+        });
+  
+      // ✅ Now that x/y are defined, draw the axes
+      g.append("g")
+        .call(d3.axisLeft(y).tickSize(0))
+        .selectAll("text")
+        .attr("fill", "#00ff00")
+        .attr("font-family", "Orbitron")
+        .attr("font-size", "12px");
+  
+      g.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .attr("fill", "#00ff00")
+        .attr("font-family", "Orbitron")
+        .attr("font-size", "12px");
+  
+      // ✅ Add legend
+      const defs = svg.append("defs");
+      const linearGradient = defs.append("linearGradient")
+        .attr("id", "legend-gradient")
+        .attr("x1", "0%").attr("y1", "0%")
+        .attr("x2", "100%").attr("y2", "0%");
+  
+      linearGradient.selectAll("stop")
+        .data([
+          { offset: "0%", color: color(0.4) },
+          { offset: "100%", color: color(0.7) }
+        ])
+        .enter().append("stop")
+        .attr("offset", d => d.offset)
+        .attr("stop-color", d => d.color);
+  
+      const legendWidth = 150;
+      const legendHeight = 12;
+  
+      svg.append("rect")
+        .attr("x", margin.left)
+        .attr("y", margin.top - 20)
+        .attr("width", legendWidth)
+        .attr("height", legendHeight)
+        .style("fill", "url(#legend-gradient)")
+        .style("stroke", "#00ffff")
+        .style("stroke-width", 1);
+  
+      svg.append("text")
+        .attr("x", margin.left)
+        .attr("y", margin.top - 25)
+        .attr("fill", "#00ff00")
+        .attr("font-family", "Orbitron")
+        .attr("font-size", "12px")
+        .text("Lower Risk ");
+  
+      svg.append("text")
+        .attr("x", margin.left + legendWidth)
+        .attr("y", margin.top - 25)
+        .attr("text-anchor", "end")
+        .attr("fill", "#00ff00")
+        .attr("font-family", "Orbitron")
+        .attr("font-size", "12px")
+        .text("Higher Risk");
+    });
+  }  
 
   function renderWorkRiskChart() {
     const data = [
@@ -303,11 +385,10 @@ function createRadarChart(data, containId='#chart-container') {
   document.getElementById("next-from-engineering").addEventListener("click", () => {
     document.getElementById("engineering-matrix-screen").classList.add("hidden");
     document.getElementById("risk-panels-screen").classList.remove("hidden");
-    renderSleepRiskChart();
+    renderHeatmap();
     renderWorkRiskChart();
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
-
 // Load data from CSV on page load
 window.onload = () => {
     d3.csv("data/mindscope_profiles_revised_final.csv", d3.autoType).then(data => {
@@ -354,9 +435,10 @@ window.onload = () => {
         } else if (selected === "engineering") {
           document.getElementById("engineering-matrix-screen").classList.remove("hidden");
           renderEngineeringMatrix();
-        } else {
+        } 
+        else {
           document.getElementById("risk-panels-screen").classList.remove("hidden");
-          renderSleepRiskChart();
+          renderHeatmap();
           renderWorkRiskChart();
         }
       
@@ -595,7 +677,7 @@ function renderTimelineChart() {
   }
   
   
-
+  
 
 function getRiskClass(rate) {
   if (rate >= 0.65) return "risk-critical";
@@ -616,9 +698,10 @@ document.getElementById("confirm-button").addEventListener("click", () => {
     } else if (selected === "engineering") {
       document.getElementById("engineering-matrix-screen").classList.remove("hidden");
       renderEngineeringMatrix();  // ✅ this is the new visual
-    } else {
+    } 
+    else {
       document.getElementById("risk-panels-screen").classList.remove("hidden");
-      renderSleepRiskChart();
+      renderHeatmap();
       renderWorkRiskChart();
     }
   
