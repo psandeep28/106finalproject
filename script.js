@@ -333,7 +333,7 @@ function createRadarChart(data, containId='#chart-container') {
         .attr("fill", "#00ff00")
         .attr("font-family", "Orbitron")
         .attr("font-size", "12px")
-        .text("Lower Risk ");
+        .text("Lower Risk");
   
       svg.append("text")
         .attr("x", margin.left + legendWidth)
@@ -347,6 +347,7 @@ function createRadarChart(data, containId='#chart-container') {
   }  
 
   function renderWorkRiskChart() {
+    d3.select("#work-risk-chart").selectAll("*").remove();
     const data = [
       { group: "With Depression", hours: 7.81 },
       { group: "Without Depression", hours: 6.24 }
