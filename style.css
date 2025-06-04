@@ -822,3 +822,112 @@ body::before {
     border-radius: 50%;
     display: inline-block;
   }
+
+  .avatar-container {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 15px;
+    position: relative;
+    border: 3px solid #00ff00;
+    border-radius: 10px;
+    background: rgba(0, 255, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .career-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: pixelated; /* Maintains pixel art style */
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    transition: transform 0.3s ease;
+  }
+  
+  .career-card:hover .avatar-container {
+    border-color: #ff00ff;
+    background: rgba(255, 0, 255, 0.1);
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+  }
+  
+  .career-card:hover .career-avatar {
+    transform: scale(1.1);
+  }
+  
+  .career-card.active .avatar-container {
+    border-color: #ffff00;
+    background: rgba(255, 255, 0, 0.1);
+    box-shadow: 0 0 25px rgba(255, 255, 0, 0.6);
+  }
+  
+  /* Add pixelated glow effect */
+  .avatar-container::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #00ff00, #00ffff, #ff00ff, #ffff00);
+    border-radius: 10px;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    filter: blur(10px);
+  }
+  
+  .career-card:hover .avatar-container::before {
+    opacity: 0.5;
+  }
+  
+  /* Retro game scanline effect over avatars */
+  .avatar-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 0, 0.03) 2px,
+      rgba(0, 255, 0, 0.03) 4px
+    );
+    pointer-events: none;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  
+  .career-card.active .avatar-container {
+    animation: float 2s ease-in-out infinite;
+  }
+  
+  /* Glitch effect on hover */
+  @keyframes glitch {
+    0%, 100% { 
+      transform: translate(0);
+      filter: hue-rotate(0deg);
+    }
+    25% { 
+      transform: translate(-2px, 2px);
+      filter: hue-rotate(90deg);
+    }
+    50% { 
+      transform: translate(2px, -2px);
+      filter: hue-rotate(180deg);
+    }
+    75% { 
+      transform: translate(-2px, -2px);
+      filter: hue-rotate(270deg);
+    }
+  }
+  
+  .career-card:active .career-avatar {
+    animation: glitch 0.2s ease-in-out;
+  }

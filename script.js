@@ -432,18 +432,27 @@ window.onload = () => {
 
     const grid = document.querySelector(".career-grid");
     Object.entries(careerData).forEach(([key, d]) => {
+      const avatarMap = {
+        business: 'images/business-avatar.png',
+        engineering: 'images/engineering-avatar.png',
+        arts: 'images/arts-avatar.png',
+        medicine: 'images/medicine-avatar.png'
+      };
       const card = document.createElement("div");
       card.className = "career-card";
       card.setAttribute("data-career", key);
       card.innerHTML = `
-        <div class="risk-indicator ${getRiskClass(d.depressionRate)}"></div>
-        <h3 class="career-title">${d.name.toUpperCase()}</h3>
-        <div class="career-stats">
-          <div class="stat"><div class="stat-label">Depression Rate</div><div class="stat-value depression-rate">${(d.depressionRate*100).toFixed(0)}%</div></div>
-          <div class="stat"><div class="stat-label">Avg Sleep</div><div class="stat-value sleep-duration">${d.avgSleep}</div></div>
-          <div class="stat"><div class="stat-label">Stress Level</div><div class="stat-value stress-level">${(d.stressLevel * 5).toFixed(1)}/5</div></div>
-          </div>
-      `;
+  <div class="risk-indicator ${getRiskClass(d.depressionRate)}"></div>
+  <div class="avatar-container">
+    <img src="${avatarMap[key]}" alt="${d.name} avatar" class="career-avatar" />
+  </div>
+  <h3 class="career-title">${d.name.toUpperCase()}</h3>
+  <div class="career-stats">
+    <div class="stat"><div class="stat-label">Depression Rate</div><div class="stat-value depression-rate">${(d.depressionRate*100).toFixed(0)}%</div></div>
+    <div class="stat"><div class="stat-label">Avg Sleep</div><div class="stat-value sleep-duration">${d.avgSleep}</div></div>
+    <div class="stat"><div class="stat-label">Stress Level</div><div class="stat-value stress-level">${(d.stressLevel * 5).toFixed(1)}/5</div></div>
+  </div>
+`;
       card.onclick = () => selectCareer(key);
       grid.appendChild(card);
     });
