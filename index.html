@@ -198,16 +198,61 @@
         </section>
 
         <section id="risk-panel-2" class="info-panel">
-          <h2>Work/Study Hours & Depression Risk</h2>
+          <h2>We're All In This Together</h2>
           <p>
-            Students who reported experiencing depression spend <strong>over 1.5 hours more</strong> per day working or studying compared to their non-depressed peers.
-            <br><br><strong>Average Daily Work/Study Time:</strong>
-            <ul>
-              <li><strong>With Depression:</strong> 7.81 hours/day</li>
-              <li><strong>Without Depression:</strong> 6.24 hours/day</li>
-            </ul>
+            While students with depression spend <strong>1.5 hours more</strong> per day working or studying (7.81 vs 6.24 hours/day), 
+            what's most important to understand is that <strong>no academic field is immune to mental health challenges</strong>.
           </p>
-          <div id="work-risk-chart"></div>
+          <p>
+            Whether you're in Business, Engineering, Arts, or Medicine, the pressures are real and the struggles are shared. 
+            <strong>Depression doesn't discriminate by major</strong> – it affects brilliant minds across all disciplines.
+          </p>
+          <p>
+            The visualization below shows how students from different fields ultimately face similar challenges. 
+            Remember: <strong>seeking help is a sign of strength</strong>, not weakness. You're not alone in this journey.
+          </p>
+
+          <div class="depression-legend">
+            <div class="legend-item">
+              <span class="legend-dot" style="background: #3498db"></span>
+              Business
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background: #e74c3c"></span>
+              Engineering
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background: #9b59b6"></span>
+              Arts
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background: #1abc9c"></span>
+              Medicine
+            </div>
+          </div>
+          
+          <!-- Add the depression unity visualization here -->
+          <div id="depression-unity-chart"></div>
+          
+          <!-- Phase controls -->
+          <div class="unity-controls">
+            <button onclick="goToPhase(1)" class="phase-btn">Phase 1: By Profile</button>
+            <button onclick="goToPhase(2)" class="phase-btn">Phase 2: By Factors</button>
+            <button onclick="goToPhase(3)" class="phase-btn">Phase 3: Unity</button>
+          </div>
+          
+          <!-- Phase description -->
+          <div class="phase-label" id="phase-description-label">
+            Phase 1: Grouping students by academic profile...
+          </div>
+          
+          <!-- Factor labels (hidden by default, shown in phase 2) -->
+          <div class="factor-labels-container">
+            <div class="factor-label academic-pressure" style="position: absolute; left: 50%; top: 20px; transform: translateX(-50%);">HIGH ACADEMIC PRESSURE</div>
+            <div class="factor-label work-pressure" style="position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%);">HIGH WORK PRESSURE</div>
+            <div class="factor-label financial-stress" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%);">FINANCIAL STRESS</div>
+            <div class="factor-label study-hours" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);">LONG STUDY HOURS</div>
+          </div>
         </section>
 
         <div class="panel-next-button-container">

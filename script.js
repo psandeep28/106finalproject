@@ -2,6 +2,28 @@ export { createRadarChart, startGame, goBack };
 
 
 let careerData = {};
+let currentPhase = 0;
+
+
+const degreeToProfile = {
+  'BBA': 'Business', 'MBA': 'Business', 'BCOM': 'Business', 'MCOM': 'Business',
+  'BE': 'Engineering', 'BTECH': 'Engineering', 'ME': 'Engineering', 'MTECH': 'Engineering',
+  'BCA': 'Engineering', 'MCA': 'Engineering',
+  'BA': 'Arts', 'MA': 'Arts', 'LLB': 'Arts', 'PHD': 'Arts', 'BVOC': 'Arts',
+  'BPHARM': 'Medicine', 'MPHARM': 'Medicine', 'BSC': 'Medicine', 'MSC': 'Medicine'
+};
+
+let animatedStudents = [];
+
+function normalizeDegree(degree) {
+  return (degree || '').replace(/\./g, '').replace(/\s+/g, '').toUpperCase();
+}
+
+const phaseDescriptions = {
+  1: "Phase 1: Grouping students by academic profile...",
+  2: "Phase 2: Reorganizing by mental health risk factors...",
+  3: "Phase 3: Highlighting those with depression — unity across all fields."
+};
 
 function startGame() {
   document.getElementById("welcome-screen").classList.add("hidden");
@@ -53,9 +75,9 @@ function selectCareer(career) {
   
     // 🧼 Clear & re-render risk visuals
     d3.select("#sleep-risk-chart").selectAll("*").remove();
-    d3.select("#work-risk-chart").selectAll("*").remove();
+    d3.select("depression-unity-chart").selectAll("*").remove();
     renderHeatmap();
-    renderWorkRiskChart();
+    playAllPhases();
   });
   
 
@@ -446,7 +468,265 @@ window.onload = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
       });      
 }
+
+d3.csv("data/student_depression_dataset.csv").then(data => {
+  const sampleSize = 2000; // Limit for performance
+  animatedStudents = data
+    .map((d, i) => {
+      const degree = normalizeDegree(d.Degree);
+      const profile = degreeToProfile[degree];
+      if (!profile) return null;
+
+      return {
+        id: i,
+        profile: profile,
+        hasDepression: d.Depression === '1' || d.Depression === 'Yes',
+        academicPressure: +d["Academic Pressure"] || 0,
+        workPressure: +d["Work Pressure"] || 0,
+        sleepDuration: d["Sleep Duration"],
+        financialStress: d["Financial Stress"] === 'Yes',
+        familyHistory: d["Family History of Mental Illness"] === 'Yes',
+        suicidalThoughts: d["Have you ever had suicidal thoughts ?"] === 'Yes',
+        studyHours: +d["Work/Study Hours"] || 0,
+        gender: d.Gender,
+        age: +d.Age
+      };
+    })
+    .filter(d => d !== null)
+    .sort(() => 0.5 - Math.random()) // shuffle
+    .slice(0, sampleSize);
+
+  initializeAnimation(); // 👈 trigger phase setup once data is ready
+});
 };
+
+
+function goToPhase(phase) {
+  currentPhase = phase;
+  const label = document.getElementById("phase-description-label");
+  if (label) label.textContent = phaseDescriptions[phase];
+
+  // Show/hide factor labels
+  d3.selectAll('.factor-label')
+    .classed('visible', phase === 2);
+
+  // Update button states
+  d3.selectAll('.phase-btn').classed('active', false);
+  const phaseButtons = document.querySelectorAll('.phase-btn');
+  if (phaseButtons[phase - 1]) {
+    phaseButtons[phase - 1].classList.add('active');
+  }
+
+  // Get position function for this phase
+  let positionFn;
+  switch(phase) {
+    case 1: positionFn = getPhase1Position; break;
+    case 2: positionFn = getPhase2Position; break;
+    case 3: positionFn = getPhase3Position; break;
+    default: return;
+  }
+
+  // Check if we have data and SVG
+  if (!animatedStudents || animatedStudents.length === 0) {
+    console.warn("No student data available");
+    return;
+  }
+
+  const circles = d3.selectAll("#depression-unity-chart svg circle");
+  if (circles.empty()) {
+    console.warn("No circles found - initializing animation first");
+    initializeAnimation();
+    setTimeout(() => goToPhase(phase), 100);
+    return;
+  }
+
+  // Animate dots to new positions
+  circles
+    .transition()
+    .duration(2000)
+    .attr("cx", (d, i) => {
+      const pos = positionFn(d, i);
+      return pos.x;
+    })
+    .attr("cy", (d, i) => {
+      const pos = positionFn(d, i);
+      return pos.y;
+    })
+    .attr("r", 2)
+    .attr("opacity", d => {
+      if (phase === 3 && !d.hasDepression) return 0.2;
+      return 0.8;
+    })
+    .attr("fill", d => {
+      if (phase === 3 && d.hasDepression) return "#ff6b6b";
+      
+      const profileColors = {
+        Business: '#3498db',
+        Engineering: '#e74c3c',
+        Arts: '#9b59b6',
+        Medicine: '#1abc9c'
+      };
+      return profileColors[d.profile] || "#999";
+    });
+}
+
+// Make sure position functions return correct values
+function getPhase1Position(d) {
+  const positions = {
+    Business: { x: 175, y: 100 },
+    Engineering: { x: 525, y: 100 },
+    Arts: { x: 175, y: 300 },
+    Medicine: { x: 525, y: 300 }
+  };
+
+  const base = positions[d.profile] || { x: 350, y: 200 };
+  const angle = Math.random() * 2 * Math.PI;
+  const radius = Math.random() * 60 + 20;
+  
+  return {
+    x: base.x + Math.cos(angle) * radius,
+    y: base.y + Math.sin(angle) * radius
+  };
+}
+
+function getPhase2Position(d) {
+  const centerX = 350, centerY = 200;
+  let x = centerX, y = centerY;
+  
+  // Use gradual positioning based on actual values, not just binary
+  // Academic pressure affects vertical position (higher pressure = higher up)
+  const academicOffset = ((d.academicPressure - 5) / 5) * 100; // Scale from -100 to +100
+  y -= academicOffset;
+  
+  // Work pressure also affects vertical but opposite direction
+  const workOffset = ((d.workPressure - 5) / 5) * 50;
+  y += workOffset;
+  
+  // Financial stress affects horizontal position
+  if (d.financialStress) {
+    x -= 120 + (Math.random() * 60 - 30); // More variation
+  }
+  
+  // Study hours affects horizontal position
+  const studyOffset = ((d.studyHours - 8) / 4) * 80; // Gradual based on hours
+  x += studyOffset;
+  
+  // Add more random spread to avoid perfect clusters
+  const angle = Math.random() * Math.PI * 2;
+  const spread = Math.random() * 40 + 20;
+  x += Math.cos(angle) * spread;
+  y += Math.sin(angle) * spread;
+  
+  // Keep within bounds
+  x = Math.max(50, Math.min(650, x));
+  y = Math.max(50, Math.min(350, y));
+  
+  return { x, y };
+}
+
+function getPhase3Position(d, i) {
+  const width = 700, height = 450;
+  const centerX = width / 2;
+  const centerY = height / 2;
+
+  // ALL students form the heart shape
+  const index = animatedStudents.indexOf(d);
+  const total = animatedStudents.length;
+  
+  // Distribute all students evenly around the heart
+  const t = (index / total) * Math.PI * 2;
+  
+  // Heart parametric equation - larger and clearer
+  const scale = 120; // Bigger heart
+  const x = scale * Math.pow(Math.sin(t), 3);
+  const y = -(scale * 0.8) * (1.3 * Math.cos(t) - 0.5 * Math.cos(2*t) - 0.2 * Math.cos(3*t) - 0.1 * Math.cos(4*t));
+  
+  return { 
+    x: centerX + x, 
+    y: centerY + y
+  };
+}
+
+// Make functions globally available
+window.goToPhase = goToPhase;
+window.currentPhase = currentPhase;
+
+function initializeAnimation() {
+  const svg = d3.select("#depression-unity-chart").html("").append("svg")
+    .attr("width", 700)
+    .attr("height", 450);
+
+  // Create tooltip div if it doesn't exist
+  let tooltip = d3.select("body").select(".depression-tooltip");
+  if (tooltip.empty()) {
+    tooltip = d3.select("body")
+      .append("div")
+      .attr("class", "depression-tooltip tooltip")
+      .style("opacity", 0)
+      .style("position", "absolute")
+      .style("pointer-events", "none");
+  }
+
+  svg.selectAll("circle")
+    .data(animatedStudents)
+    .enter()
+    .append("circle")
+    .attr("r", 2)
+    .attr("fill", d => {
+      const profileColors = {
+        Business: '#3498db',
+        Engineering: '#e74c3c',
+        Arts: '#9b59b6',
+        Medicine: '#1abc9c'
+      };
+      return profileColors[d.profile] || "#999";
+    })
+    .attr("cx", d => Math.random() * 700)
+    .attr("cy", d => Math.random() * 450)
+    .attr("opacity", 0.8)
+    .style("cursor", "pointer")
+    .on("mouseover", function(event, d) {
+      // Make the dot bigger on hover
+      d3.select(this)
+        .transition()
+        .duration(200)
+        .attr("r", 5);
+      
+      // Show tooltip
+      tooltip.transition()
+        .duration(200)
+        .style("opacity", .9);
+      
+      tooltip.html(`
+        <strong>${d.profile} Student</strong><br/>
+        Depression: ${d.hasDepression ? 'Yes' : 'No'}<br/>
+        Academic Pressure: ${d.academicPressure.toFixed(1)}/10<br/>
+        Study Hours: ${d.studyHours.toFixed(1)}/day<br/>
+        Financial Stress: ${d.financialStress ? 'Yes' : 'No'}
+      `)
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 28) + "px");
+    })
+    .on("mouseout", function(event, d) {
+      // Return to normal size
+      d3.select(this)
+        .transition()
+        .duration(200)
+        .attr("r", 2);
+      
+      // Hide tooltip
+      tooltip.transition()
+        .duration(500)
+        .style("opacity", 0);
+    });
+}
+
+
+function playAllPhases() {
+  goToPhase(1);
+  setTimeout(() => goToPhase(2), 3000);
+  setTimeout(() => goToPhase(3), 6000);
+}
 
 function renderTimelineChart() {
     const margin = { top: 60, right: 70, bottom: 130, left: 60 },
@@ -686,28 +966,52 @@ function getRiskClass(rate) {
   if (rate >= 0.35) return "risk-medium";
   return "risk-low";
 }
-
 document.getElementById("confirm-button").addEventListener("click", () => {
-    document.getElementById("profiles-screen").classList.add("hidden");
-    document.getElementById("confirm-container").classList.add("hidden");
-  
-    const selected = window.selectedCareer.toLowerCase();
-  
-    if (selected === "business") {
-      document.getElementById("timeline-screen").classList.remove("hidden");
-      renderTimelineChart();
-    } else if (selected === "engineering") {
-      document.getElementById("engineering-matrix-screen").classList.remove("hidden");
-      renderEngineeringMatrix();  // ✅ this is the new visual
-    } 
-    else {
-      document.getElementById("risk-panels-screen").classList.remove("hidden");
-      renderHeatmap();
-      renderWorkRiskChart();
+  document.getElementById("profiles-screen").classList.add("hidden");
+  document.getElementById("confirm-container").classList.add("hidden");
+
+  const selected = window.selectedCareer.toLowerCase();
+
+  if (selected === "business") {
+    document.getElementById("timeline-screen").classList.remove("hidden");
+    renderTimelineChart();
+  } else if (selected === "engineering") {
+    document.getElementById("engineering-matrix-screen").classList.remove("hidden");
+    renderEngineeringMatrix();
+  } 
+  else {
+    document.getElementById("risk-panels-screen").classList.remove("hidden");
+    renderHeatmap();
+    
+    // Initialize the depression animation if data is loaded
+    if (animatedStudents && animatedStudents.length > 0) {
+      initializeAnimation();
+      setTimeout(() => playAllPhases(), 500);
     }
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+document.getElementById("next-to-risk").addEventListener("click", () => {
+  // Hide timeline
+  document.getElementById("timeline-screen").classList.add("hidden");
+
+  // Show risk panels
+  document.getElementById("risk-panels-screen").classList.remove("hidden");
+
+  // Clear & re-render risk visuals
+  d3.select("#sleep-risk-chart").selectAll("*").remove();
+  d3.select("#depression-unity-chart").selectAll("*").remove(); // Fixed: added #
   
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
+  renderHeatmap();
+  
+  // Initialize and play depression animation
+  if (animatedStudents && animatedStudents.length > 0) {
+      initializeAnimation();
+      setTimeout(() => playAllPhases(), 500);
+  }
+});
   
   
   
