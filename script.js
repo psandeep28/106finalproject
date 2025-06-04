@@ -366,6 +366,9 @@ function createRadarChart(data, containId='#chart-container') {
         .attr("font-size", "12px")
         .text("Higher Risk");
     });
+
+    renderDietaryHabitsChart();
+    renderStudySatisfactionChart();
   }  
 
   function renderWorkRiskChart() {
@@ -1037,3 +1040,237 @@ document.getElementById("next-to-risk").addEventListener("click", () => {
       });
     }
   });
+
+function renderDietaryHabitsChart() {
+  const container = d3.select('#dietary-habits-chart');
+  container.selectAll('*').remove();
+  const margin = { top: 40, right: 200, bottom: 50, left: 60 };
+  const width = 600 - margin.left - margin.right;
+  const height = 350 - margin.top - margin.bottom;
+  const svg = container.append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
+  const tooltip = container.append('div').attr('class', 'tooltip');
+  d3.csv('data/student_depression_dataset.csv').then(data => {
+    data.forEach(d => {
+      d['Dietary Habits'] = (d['Dietary Habits'] || '').replace(/'/g, '').trim();
+      d.Depression = +d.Depression;
+    });
+    const habits = Array.from(new Set(data.map(d => d['Dietary Habits'])));
+    const depressionCats = [0, 1];
+    const grouped = {};
+    habits.forEach(habit => {
+      grouped[habit] = { habit };
+      depressionCats.forEach(dep => {
+        grouped[habit][dep] = data.filter(d => d['Dietary Habits'] === habit && d.Depression === dep).length;
+      });
+    });
+    const chartData = Object.values(grouped);
+    const stack = d3.stack().keys(depressionCats);
+    const series = stack(chartData);
+    const x = d3.scaleBand().domain(habits).range([0, width]).padding(0.2);
+    const y = d3.scaleLinear().domain([0, d3.max(chartData, d => d[0] + d[1])]).nice().range([height, 0]);
+    const color = d3.scaleOrdinal().domain(depressionCats).range(['#1f77b4', '#d62728']);
+    svg.append('g').attr('transform', `translate(0,${height})`).call(d3.axisBottom(x));
+    svg.append('g').call(d3.axisLeft(y));
+    const groups = svg.selectAll('.series')
+      .data(series)
+      .enter().append('g')
+      .attr('class', 'series')
+      .attr('fill', d => color(d.key));
+    groups.selectAll('rect')
+      .data(d => d)
+      .enter().append('rect')
+      .attr('x', d => x(d.data.habit))
+      .attr('y', d => y(d[1]))
+      .attr('height', d => y(d[0]) - y(d[1]))
+      .attr('width', x.bandwidth())
+      .on('mouseover', function(event, d) {
+        const dep = this.parentNode.__data__.key;
+        tooltip.style('opacity', 1)
+          .html(`<strong>Dietary Habit:</strong> ${d.data.habit}<br><strong>${dep == 1 ? 'Depressed' : 'Not Depressed'}:</strong> ${d.data[dep]}`)
+          .style('left', (event.pageX + 12) + 'px')
+          .style('top',  (event.pageY - 28) + 'px');
+      })
+      .on('mousemove', function(event) {
+        tooltip.style('left', (event.pageX + 12) + 'px').style('top',  (event.pageY - 28) + 'px');
+      })
+      .on('mouseout', function() { tooltip.style('opacity', 0); });
+    // Legend
+    const legendData = [
+      { label: 'Not Depressed (Blue)', value: 0 },
+      { label: 'Depressed (Red)', value: 1 }
+    ];
+    const legend = svg.append('g')
+      .attr('class', 'legend')
+      .attr('transform', `translate(${width + 30}, 10)`);
+    legend.append('text')
+      .attr('x', 0)
+      .attr('y', -20)
+      .attr('font-size', '16px')
+      .attr('fill', '#fff')
+      .text('Legend:');
+    legendData.forEach((d, i) => {
+      const item = legend.append('g')
+        .attr('class', 'legend-item')
+        .attr('transform', `translate(0, ${i * 30})`)
+        .style('cursor', 'pointer')
+        .on('click', () => toggleStatus(d.value));
+      item.append('rect')
+        .attr('width', 18)
+        .attr('height', 18)
+        .attr('fill', color(d.value));
+      item.append('text')
+        .attr('x', 24)
+        .attr('y', 14)
+        .attr('font-size', '14px')
+        .attr('fill', '#fff')
+        .text(d.label);
+    });
+    const visibility = { 0: true, 1: true };
+    function toggleStatus(val) {
+      visibility[val] = !visibility[val];
+      svg.selectAll('.series')
+        .filter(d => d.key == val)
+        .attr('display', visibility[val] ? null : 'none');
+      legend.selectAll('.legend-item')
+        .filter((d, i) => legendData[i].value == val)
+        .select('text')
+        .attr('fill-opacity', visibility[val] ? 1 : 0.3);
+      legend.selectAll('.legend-item')
+        .filter((d, i) => legendData[i].value == val)
+        .select('rect')
+        .attr('fill-opacity', visibility[val] ? 1 : 0.3);
+    }
+    svg.append('text')
+      .attr('x', width / 2)
+      .attr('y', -20)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', '18px')
+      .attr('fill', '#ff00ff')
+      .text('Depression Status by Dietary Habits');
+  });
+}
+
+function renderStudySatisfactionChart() {
+  const container = d3.select('#study-satisfaction-chart');
+  container.selectAll('*').remove();
+  const margin = { top: 40, right: 200, bottom: 50, left: 60 };
+  const width = 600 - margin.left - margin.right;
+  const height = 350 - margin.top - margin.bottom;
+  const svg = container.append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
+  const tooltip = container.append('div').attr('class', 'tooltip');
+  d3.csv('data/student_depression_dataset.csv').then(data => {
+    data.forEach(d => {
+      d['Study Satisfaction'] = +d['Study Satisfaction'];
+      d.Depression = +d.Depression;
+    });
+    const sats = Array.from(new Set(data.map(d => d['Study Satisfaction']))).sort((a, b) => a - b);
+    const depressionCats = [0, 1];
+    const grouped = {};
+    sats.forEach(sat => {
+      grouped[sat] = { sat };
+      depressionCats.forEach(dep => {
+        grouped[sat][dep] = data.filter(d => d['Study Satisfaction'] === sat && d.Depression === dep).length;
+      });
+    });
+    const chartData = Object.values(grouped);
+    const stack = d3.stack().keys(depressionCats);
+    const series = stack(chartData);
+    const x = d3.scaleBand().domain(sats).range([0, width]).padding(0.2);
+    const y = d3.scaleLinear().domain([0, d3.max(chartData, d => d[0] + d[1])]).nice().range([height, 0]);
+    const color = d3.scaleOrdinal().domain(depressionCats).range(['#1f77b4', '#d62728']);
+    svg.append('g').attr('transform', `translate(0,${height})`).call(d3.axisBottom(x));
+    svg.append('g').call(d3.axisLeft(y));
+    const groups = svg.selectAll('.series')
+      .data(series)
+      .enter().append('g')
+      .attr('class', 'series')
+      .attr('fill', d => color(d.key));
+    groups.selectAll('rect')
+      .data(d => d)
+      .enter().append('rect')
+      .attr('x', d => x(d.data.sat))
+      .attr('y', d => y(d[1]))
+      .attr('height', d => y(d[0]) - y(d[1]))
+      .attr('width', x.bandwidth())
+      .on('mouseover', function(event, d) {
+        const dep = this.parentNode.__data__.key;
+        tooltip.style('opacity', 1)
+          .html(`<strong>Study Satisfaction:</strong> ${d.data.sat}<br><strong>${dep == 1 ? 'Depressed' : 'Not Depressed'}:</strong> ${d.data[dep]}`)
+          .style('left', (event.pageX + 12) + 'px')
+          .style('top',  (event.pageY - 28) + 'px');
+      })
+      .on('mousemove', function(event) {
+        tooltip.style('left', (event.pageX + 12) + 'px').style('top',  (event.pageY - 28) + 'px');
+      })
+      .on('mouseout', function() { tooltip.style('opacity', 0); });
+    // Legend
+    const legendData = [
+      { label: 'Not Depressed (Blue)', value: 0 },
+      { label: 'Depressed (Red)', value: 1 }
+    ];
+    const legend = svg.append('g')
+      .attr('class', 'legend')
+      .attr('transform', `translate(${width + 30}, 10)`);
+    legend.append('text')
+      .attr('x', 0)
+      .attr('y', -20)
+      .attr('font-size', '16px')
+      .attr('fill', '#fff')
+      .text('Legend:');
+    legendData.forEach((d, i) => {
+      const item = legend.append('g')
+        .attr('class', 'legend-item')
+        .attr('transform', `translate(0, ${i * 30})`)
+        .style('cursor', 'pointer')
+        .on('click', () => toggleStatus(d.value));
+      item.append('rect')
+        .attr('width', 18)
+        .attr('height', 18)
+        .attr('fill', color(d.value));
+      item.append('text')
+        .attr('x', 24)
+        .attr('y', 14)
+        .attr('font-size', '14px')
+        .attr('fill', '#fff')
+        .text(d.label);
+    });
+    const visibility = { 0: true, 1: true };
+    function toggleStatus(val) {
+      visibility[val] = !visibility[val];
+      svg.selectAll('.series')
+        .filter(d => d.key == val)
+        .attr('display', visibility[val] ? null : 'none');
+      legend.selectAll('.legend-item')
+        .filter((d, i) => legendData[i].value == val)
+        .select('text')
+        .attr('fill-opacity', visibility[val] ? 1 : 0.3);
+      legend.selectAll('.legend-item')
+        .filter((d, i) => legendData[i].value == val)
+        .select('rect')
+        .attr('fill-opacity', visibility[val] ? 1 : 0.3);
+    }
+    svg.append('text')
+      .attr('x', width / 2)
+      .attr('y', -20)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', '18px')
+      .attr('fill', '#ff00ff')
+      .text('Depression Status by Study Satisfaction');
+  });
+}
+
+// Add calls to these in renderHeatmap or risk panel logic
+const oldRenderHeatmap = renderHeatmap;
+renderHeatmap = function() {
+  oldRenderHeatmap();
+  renderDietaryHabitsChart();
+  renderStudySatisfactionChart();
+}
