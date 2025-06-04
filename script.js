@@ -461,6 +461,11 @@ window.onload = () => {
         } else if (selected === "engineering") {
           document.getElementById("engineering-matrix-screen").classList.remove("hidden");
           renderEngineeringMatrix();
+        }
+        else if (selected === "arts") {
+          document.getElementById("arts-analysis-screen").classList.remove("hidden");
+          renderDietaryHabitsChart();
+          renderStudySatisfactionChart();
         } 
         else {
           document.getElementById("risk-panels-screen").classList.remove("hidden");
@@ -981,12 +986,16 @@ document.getElementById("confirm-button").addEventListener("click", () => {
   } else if (selected === "engineering") {
     document.getElementById("engineering-matrix-screen").classList.remove("hidden");
     renderEngineeringMatrix();
-  } 
-  else {
+  } else if (selected === "arts") {
+    // NEW: Show arts-specific screen
+    document.getElementById("arts-analysis-screen").classList.remove("hidden");
+    renderDietaryHabitsChart();
+    renderStudySatisfactionChart();
+  } else {
+    // Medicine or other profiles go to risk panels
     document.getElementById("risk-panels-screen").classList.remove("hidden");
     renderHeatmap();
     
-    // Initialize the depression animation if data is loaded
     if (animatedStudents && animatedStudents.length > 0) {
       initializeAnimation();
       setTimeout(() => playAllPhases(), 500);
@@ -1016,7 +1025,19 @@ document.getElementById("next-to-risk").addEventListener("click", () => {
   }
 });
   
+document.getElementById("next-from-arts").addEventListener("click", () => {
+  document.getElementById("arts-analysis-screen").classList.add("hidden");
+  document.getElementById("risk-panels-screen").classList.remove("hidden");
   
+  renderHeatmap();
+  
+  if (animatedStudents && animatedStudents.length > 0) {
+    initializeAnimation();
+    setTimeout(() => playAllPhases(), 500);
+  }
+  
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
   
 
   document.getElementById("next-to-user").addEventListener("click", () => {
