@@ -476,6 +476,11 @@ window.onload = () => {
           renderDietaryHabitsChart();
           renderStudySatisfactionChart();
         } 
+        else if (selected === "medicine") {
+          document.getElementById("medicine-analysis-screen").classList.remove("hidden");
+          // Call the medicine spiral from the separate file
+          MedicineSpiral.render();
+        }
         else {
           document.getElementById("risk-panels-screen").classList.remove("hidden");
           renderHeatmap();
@@ -1000,7 +1005,14 @@ document.getElementById("confirm-button").addEventListener("click", () => {
     document.getElementById("arts-analysis-screen").classList.remove("hidden");
     renderDietaryHabitsChart();
     renderStudySatisfactionChart();
-  } else {
+  } 
+  else if (selected === "medicine") {
+    document.getElementById("medicine-analysis-screen").classList.remove("hidden");
+    // Only call this once and add a delay to ensure DOM is ready
+    setTimeout(() => {
+      MedicineSpiral.render();
+    }, 100);
+  }else {
     // Medicine or other profiles go to risk panels
     document.getElementById("risk-panels-screen").classList.remove("hidden");
     renderHeatmap();
@@ -1037,6 +1049,23 @@ document.getElementById("next-to-risk").addEventListener("click", () => {
 document.getElementById("next-from-arts").addEventListener("click", () => {
   document.getElementById("arts-analysis-screen").classList.add("hidden");
   document.getElementById("risk-panels-screen").classList.remove("hidden");
+  
+  renderHeatmap();
+  
+  if (animatedStudents && animatedStudents.length > 0) {
+    initializeAnimation();
+    setTimeout(() => playAllPhases(), 500);
+  }
+  
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+document.getElementById("next-from-medicine").addEventListener("click", () => {
+  document.getElementById("medicine-analysis-screen").classList.add("hidden");
+  document.getElementById("risk-panels-screen").classList.remove("hidden");
+  
+  // Clean up tooltips
+  d3.selectAll('.medicine-spiral-tooltip').remove();
   
   renderHeatmap();
   
@@ -1183,6 +1212,40 @@ function renderDietaryHabitsChart() {
       .text('Depression Status by Dietary Habits');
   });
 }
+
+function addBackButtonHandlers() {
+  const screens = [
+    { screen: '#timeline-screen', button: '#timeline-screen .back-button' },
+    { screen: '#engineering-matrix-screen', button: '#engineering-matrix-screen .back-button' },
+    { screen: '#arts-analysis-screen', button: '#arts-analysis-screen .back-button' },
+    { screen: '#medicine-analysis-screen', button: '#medicine-analysis-screen .back-button' }
+  ];
+  
+  screens.forEach(config => {
+    const backBtn = document.querySelector(config.button);
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        // Hide current screen
+        document.querySelector(config.screen).classList.add("hidden");
+        
+        // Show profiles screen
+        document.getElementById("profiles-screen").classList.remove("hidden");
+        document.getElementById("visualization-panel").classList.remove("hidden");
+        
+        // Clean up tooltips
+        d3.selectAll('.tooltip').remove();
+        d3.selectAll('.medicine-spiral-tooltip').remove();
+        d3.selectAll('.ring-tooltip').remove();
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+  });
+}
+
+// Call this function when DOM is loaded
+document.addEventListener("DOMContentLoaded", addBackButtonHandlers);
 
 function renderStudySatisfactionChart() {
   const container = d3.select('#study-satisfaction-chart');
