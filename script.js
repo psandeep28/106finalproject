@@ -1066,6 +1066,603 @@ function getRiskClass(rate) {
   return "risk-low";
 }
 
+function initializeMedicineMatrix() {
+  console.log('🔬 Initializing enhanced medicine matrix...');
+  
+  // Constants and helpers
+  const medicineDegrees = new Set(['B.Pharm', 'M.Pharm', 'BSc', 'MSc', 'BPHARM', 'MPHARM']);
+  
+  const sleepToHrs = (s) => {
+    s = String(s).toLowerCase();
+    if (s.includes('less')) return 4.5;
+    if (s.includes('5-6')) return 5.5;
+    if (s.includes('7-8')) return 7.5;
+    if (s.includes('more')) return 8.5;
+    return 6;
+  };
+
+  // SVG setup with enhanced styling
+  const svg = d3.select('#medicine-matrix-plot');
+  const W = +svg.attr('width');
+  const H = +svg.attr('height');
+  const M = { left: 120, right: 40, top: 80, bottom: 80 };
+  const PW = W - M.left - M.right;
+  const PH = H - M.top - M.bottom;
+  const g = svg.append('g').attr('transform', `translate(${M.left},${M.top})`);
+  const tip = d3.select('#medicine-matrix-tooltip');
+
+  // Enhanced color and size scales
+  const colour = d3.scaleLinear()
+    .domain([0, 0.5, 1])
+    .range(['#36e4fd', '#ffe987', '#ff6f96']);
+
+  const size = d3.scaleLinear()
+    .domain([1, 5])
+    .range([12, 32]);
+
+  // Load and process data
+  d3.csv('data/student_depression_dataset.csv').then(raw => {
+    console.log('📊 Processing medicine student data...');
+    
+    const data = raw
+      .filter(d => {
+        const degree = String(d.Degree || '').replace(/\s+/g, '').toUpperCase();
+        return medicineDegrees.has(degree) || 
+               degree.includes('PHARM') || 
+               degree.includes('BSC') || 
+               degree.includes('MSC');
+      })
+      .map(d => ({
+        pressure: +d['Academic Pressure'] || 0,
+        sleep: sleepToHrs(d['Sleep Duration']),
+        satisf: +d['Study Satisfaction'] || 0,
+        depressed: +d.Depression === 1,
+        gender: (d.Gender || '').trim(),
+        degree: (d.Degree || '').trim()
+      }))
+      .filter(d => d.pressure > 0 && d.satisf > 0); // Filter out invalid data
+
+    console.log(`📈 Found ${data.length} medicine students for analysis`);
+
+    // Populate degree dropdown
+    const degrees = ['All', ...new Set(data.map(d => d.degree)).values()];
+    d3.select('#medicine-degree-select')
+      .selectAll('option')
+      .data(degrees)
+      .join('option')
+      .attr('value', d => d)
+      .text(d => d === 'All' ? 'All Medicine Students' : d);
+
+    // Enhanced axes with cyberpunk styling
+    const x = d3.scaleLinear().domain([1, 5]).range([0, PW]);
+    const y = d3.scalePoint()
+      .domain([4.5, 5.5, 7.5, 8.5])
+      .range([PH, 0])
+      .padding(0.3);
+
+    // X-axis
+    g.append('g')
+      .attr('class', 'matrix-axis')
+      .attr('transform', `translate(0,${PH})`)
+      .call(d3.axisBottom(x).tickValues([1, 2, 3, 4, 5]))
+      .selectAll('text')
+      .style('fill', '#00ffcc')
+      .style('font-family', 'Orbitron')
+      .style('font-size', '14px');
+
+    // Y-axis
+    g.append('g')
+      .attr('class', 'matrix-axis')
+      .call(d3.axisLeft(y).tickFormat(d => d + ' hrs'))
+      .selectAll('text')
+      .style('fill', '#00ffcc')
+      .style('font-family', 'Orbitron')
+      .style('font-size', '14px');
+
+    // Enhanced axis labels
+    g.append('text')
+      .attr('class', 'matrix-axis-label')
+      .attr('x', PW / 2)
+      .attr('y', PH + 50)
+      .attr('text-anchor', 'middle')
+      .style('fill', '#00ffcc')
+      .style('font-family', 'Orbitron')
+      .style('font-size', '16px')
+      .style('font-weight', '600')
+      .text('Academic Pressure Level (1-5)');
+
+    g.append('text')
+      .attr('class', 'matrix-axis-label')
+      .attr('x', -60)
+      .attr('y', PH / 2)
+      .attr('transform', `rotate(-90,-60,${PH / 2})`)
+      .attr('text-anchor', 'middle')
+      .style('fill', '#00ffcc')
+      .style('font-family', 'Orbitron')
+      .style('font-size', '16px')
+      .style('font-weight', '600')
+      .text('Sleep Duration');
+
+    // Enhanced update function
+    function update() {
+      const deg = d3.select('#medicine-degree-select').property('value');
+      const showF = d3.select('#medicine-show-females').property('checked');
+      const showM = d3.select('#medicine-show-males').property('checked');
+
+      const filt = data.filter(d =>
+        (deg === 'All' || d.degree === deg) &&
+        ((d.gender === 'Female' && showF) || (d.gender === 'Male' && showM))
+      );
+
+      console.log(`🔍 Filtered to ${filt.length} students`);
+
+      // Aggregate by (pressure, sleep) with enhanced grouping
+      const byCell = d3.groups(filt, 
+        d => Math.round(d.pressure), 
+        d => d.sleep
+      );
+      
+      const cells = [];
+      byCell.forEach(([p, rowsBySleep]) => {
+        rowsBySleep.forEach(([s, arr]) => {
+          if (arr.length < 3) return; // Minimum threshold
+          cells.push({
+            pressure: +p,
+            sleep: +s,
+            count: arr.length,
+            avgSat: d3.mean(arr, d => d.satisf),
+            pctDep: arr.filter(d => d.depressed).length / arr.length,
+            riskLevel: getRiskLevel(+p, +s, arr.filter(d => d.depressed).length / arr.length)
+          });
+        });
+      });
+
+      console.log(`📊 Created ${cells.length} data points for visualization`);
+
+      // Enhanced dot visualization
+      const dot = g.selectAll('.agg-dot')
+        .data(cells, d => `${d.pressure}-${d.sleep}`);
+
+      dot.exit()
+        .transition()
+        .duration(300)
+        .attr('r', 0)
+        .style('opacity', 0)
+        .remove();
+
+      dot.enter()
+        .append('circle')
+        .attr('class', 'agg-dot')
+        .attr('r', 0)
+        .style('opacity', 0)
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 2)
+        .merge(dot)
+        .on('mouseover', (event, d) => {
+          d3.select(event.currentTarget)
+            .attr('stroke', '#00ff00')
+            .attr('stroke-width', 3)
+            .style('filter', 'brightness(1.3)');
+
+          tip.style('opacity', 1)
+            .html(`
+              <div style="text-align: center; margin-bottom: 0.5rem;">
+                <strong style="color: #00ff00; font-size: 1.1rem;">Medicine Students</strong>
+              </div>
+              <div><strong>Academic Pressure:</strong> ${d.pressure}/5</div>
+              <div><strong>Sleep Duration:</strong> ${d.sleep} hours</div>
+              <div><strong>Student Count:</strong> ${d.count}</div>
+              <div><strong>Avg Study Satisfaction:</strong> ${d.avgSat.toFixed(1)}/5</div>
+              <div><strong>Depression Rate:</strong> ${(d.pctDep * 100).toFixed(1)}%</div>
+              <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #00ffcc;">
+                <strong style="color: ${d.riskLevel.color};">${d.riskLevel.label}</strong>
+              </div>
+            `)
+            .style('left', (event.clientX + 15) + 'px')
+            .style('top', (event.clientY - 10) + 'px');
+        })
+        .on('mousemove', event => {
+          tip.style('left', (event.clientX + 15) + 'px')
+            .style('top', (event.clientY - 10) + 'px');
+        })
+        .on('mouseout', event => {
+          d3.select(event.currentTarget)
+            .attr('stroke', '#fff')
+            .attr('stroke-width', 2)
+            .style('filter', 'brightness(1)');
+          tip.style('opacity', 0);
+        })
+        .transition()
+        .duration(500)
+        .delay((d, i) => i * 50)
+        .attr('cx', d => x(d.pressure))
+        .attr('cy', d => y(d.sleep))
+        .attr('r', d => size(d.avgSat))
+        .attr('fill', d => colour(d.pctDep))
+        .style('opacity', 0.85);
+    }
+
+    // Enhanced risk level calculation
+    function getRiskLevel(pressure, sleep, depRate) {
+      if (pressure >= 4 && sleep <= 5.5) {
+        return { label: 'Critical Risk Zone', color: '#ff6f96' };
+      } else if (pressure >= 3.5 && sleep <= 6) {
+        return { label: 'High Risk', color: '#ff8c42' };
+      } else if (pressure <= 2.5 && sleep >= 7) {
+        return { label: 'Optimal Zone', color: '#36e4fd' };
+      } else if (depRate <= 0.3) {
+        return { label: 'Protective Pattern', color: '#ffe987' };
+      } else {
+        return { label: 'Moderate Risk', color: '#ffd93d' };
+      }
+    }
+
+    // Enhanced event listeners
+    d3.select('#medicine-degree-select').on('change', update);
+    d3.select('#medicine-show-females').on('change', update);
+    d3.select('#medicine-show-males').on('change', update);
+
+    // Initial render
+    update();
+    console.log('✅ Medicine matrix visualization ready!');
+  }).catch(error => {
+    console.error('❌ Error loading medicine matrix data:', error);
+  });
+}
+
+// Initialize when medicine screen is shown
+document.addEventListener('DOMContentLoaded', function() {
+  // Wait for the medicine analysis screen to be shown
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        const medicineScreen = document.getElementById('medicine-analysis-screen');
+        if (medicineScreen && !medicineScreen.classList.contains('hidden')) {
+          // Medicine screen is now visible, initialize matrix
+          setTimeout(() => {
+            if (document.getElementById('medicine-matrix-plot') && !window.medicineMatrixInitialized) {
+              initializeMedicineMatrix();
+              window.medicineMatrixInitialized = true;
+            }
+          }, 500);
+        }
+      }
+    });
+  });
+
+  // Observe changes to the medicine screen
+  const medicineScreen = document.getElementById('medicine-analysis-screen');
+  if (medicineScreen) {
+    observer.observe(medicineScreen, { attributes: true });
+  }
+});
+
+
+function initializeArtsRadial() {
+  console.log('🎨 Initializing enhanced arts radial visualization...');
+  
+  // Constants and helpers
+  const ARTS = new Set(['BA', 'MA', 'LLB', 'PhD', 'BVoc', 'BVOC']);
+  
+  const sleepBucket = (s) => {
+    s = String(s).toLowerCase();
+    if (s.includes('less')) return '<5 h';
+    if (s.includes('5-6')) return '5-6 h';
+    if (s.includes('7-8')) return '7-8 h';
+    if (s.includes('more')) return '8+ h';
+    return 'unknown';
+  };
+
+  const sleepOrder = ['<5 h', '5-6 h', '7-8 h', '8+ h'];
+
+  // SVG setup
+  const svg = d3.select('#arts-radial');
+  const W = +svg.attr('width');
+  const H = +svg.attr('height');
+  const R = Math.min(W, H) / 2 - 60;
+  const g = svg.append('g').attr('transform', `translate(${W/2},${H/2})`);
+  const tip = d3.select('#arts-radial-tooltip');
+
+  // Enhanced scales
+  const colour = d3.scaleLinear()
+    .domain([0, 0.5, 1])
+    .range(['#36e4fd', '#ffe987', '#ff6f96']);
+
+  const thick = d3.scaleSqrt().range([15, 55]);
+  const ringR = sleepOrder.map((_, i) => [i * 70 + 30, i * 70 + 75]);
+
+  // Load and process data
+  d3.csv('data/student_depression_dataset.csv').then(rows => {
+    console.log('📊 Processing arts student data...');
+    
+    // Enhanced data processing
+    rows.forEach(d => {
+      const degree = String(d.Degree || '').replace(/\s+/g, '').toUpperCase();
+      d.isArts = ARTS.has(degree) || degree.includes('BA') || degree.includes('MA') || 
+                 degree.includes('LLB') || degree.includes('PHD') || degree.includes('BVOC');
+      d.sleep = sleepBucket(d['Sleep Duration']);
+      d.press = +d['Academic Pressure'] || 0;
+      d.dep = +d.Depression === 1;
+      d.gender = (d.Gender || '').trim();
+    });
+
+    const artsStudents = rows.filter(d => d.isArts);
+    console.log(`🎭 Found ${artsStudents.length} arts students for analysis`);
+
+    // Enhanced drawing function
+    function draw() {
+      const showF = d3.select('#arts-fem').property('checked');
+      const showM = d3.select('#arts-male').property('checked');
+      const showT = d3.select('#arts-small').property('checked');
+
+      const arts = artsStudents.filter(d =>
+        ((d.gender === 'Female' && showF) || (d.gender === 'Male' && showM))
+      );
+
+      let cells = d3.rollups(
+        arts,
+        v => ({ n: v.length, p: d3.mean(v, x => x.dep) }),
+        d => d.sleep,
+        d => Math.round(d.press) // Round pressure to integer
+      ).flatMap(([sleep, a]) => 
+        a.map(([pr, val]) => ({ sleep, press: +pr, ...val }))
+      ).filter(d => d.press >= 1 && d.press <= 5); // Only valid pressure ranges
+
+      if (!showT) cells = cells.filter(d => d.n >= 4);
+      
+      console.log(`📈 Analyzing ${cells.length} arts student groups`);
+      
+      thick.domain(d3.extent(cells, d => d.n) || [1, 10]);
+
+      // Enhanced arc generator
+      const arc = d3.arc()
+        .startAngle(d => (d.press - 1) * 2 * Math.PI / 5)
+        .endAngle(d => d.press * 2 * Math.PI / 5)
+        .innerRadius(d => {
+          const ringIndex = sleepOrder.indexOf(d.sleep);
+          return ringIndex >= 0 ? ringR[ringIndex][0] : 50;
+        })
+        .outerRadius(d => {
+          const ringIndex = sleepOrder.indexOf(d.sleep);
+          const baseRadius = ringIndex >= 0 ? ringR[ringIndex][0] : 50;
+          return baseRadius + thick(d.n);
+        });
+
+      // Enhanced data join
+      const seg = g.selectAll('.arts-cell').data(cells, d => `${d.sleep}-${d.press}`);
+      
+      seg.exit()
+        .transition()
+        .duration(300)
+        .style('opacity', 0)
+        .remove();
+
+      seg.enter()
+        .append('path')
+        .attr('class', 'arts-cell')
+        .attr('stroke', '#2c2c2c')
+        .attr('stroke-width', 1.5)
+        .style('opacity', 0)
+        .merge(seg)
+        .on('mouseover', (event, d) => {
+          d3.select(event.currentTarget)
+            .attr('stroke', '#ffffff')
+            .attr('stroke-width', 3)
+            .style('filter', 'brightness(1.2)');
+            
+          tip.style('opacity', 1)
+            .html(`
+              <div style="text-align: center; margin-bottom: 0.5rem;">
+                <strong style="color: #ffffff; font-size: 1.1rem;">Arts Students</strong>
+              </div>
+              <div><strong>Sleep Duration:</strong> ${d.sleep}</div>
+              <div><strong>Academic Pressure:</strong> ${d.press}/5</div>
+              <div><strong>Student Count:</strong> ${d.n}</div>
+              <div><strong>Depression Rate:</strong> ${(d.p * 100).toFixed(1)}%</div>
+              <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #9b59b6;">
+                <strong style="color: ${d.p > 0.6 ? '#ff6f96' : d.p > 0.3 ? '#ffe987' : '#36e4fd'};">
+                  ${d.p > 0.6 ? 'High Risk' : d.p > 0.3 ? 'Moderate Risk' : 'Lower Risk'}
+                </strong>
+              </div>
+            `)
+            .style('left', (event.clientX + 15) + 'px')
+            .style('top', (event.clientY - 10) + 'px');
+        })
+        .on('mousemove', event => {
+          tip.style('left', (event.clientX + 15) + 'px')
+            .style('top', (event.clientY - 10) + 'px');
+        })
+        .on('mouseout', event => {
+          d3.select(event.currentTarget)
+            .attr('stroke', '#2c2c2c')
+            .attr('stroke-width', 1.5)
+            .style('filter', 'brightness(1)');
+          tip.style('opacity', 0);
+        })
+        .transition()
+        .duration(600)
+        .delay((d, i) => i * 50)
+        .style('opacity', 0.9)
+        .attr('d', arc)
+        .attr('fill', d => colour(d.p || 0));
+
+      // Update statistics
+      updateArtsStats(arts, cells);
+      
+      // Build enhanced legends and guides
+      buildEnhancedLegends();
+      redrawArtsLabels();
+    }
+
+    // Enhanced statistics update
+    function updateArtsStats(arts, cells) {
+      const total = arts.length;
+      const avgDepression = total > 0 ? d3.mean(arts, d => d.dep) * 100 : 0;
+      const highRiskCombos = cells.filter(d => d.p > 0.6).length;
+      const optimalSleep = arts.filter(d => d.sleep === '7-8 h').length;
+      const optimalSleepPercent = total > 0 ? (optimalSleep / total) * 100 : 0;
+
+      // Animate stats
+      animateStatValue('arts-total-students', total);
+      animateStatValue('arts-avg-depression', avgDepression, '%');
+      animateStatValue('arts-high-risk', highRiskCombos);
+      animateStatValue('arts-optimal-sleep', optimalSleepPercent, '%');
+    }
+
+    function animateStatValue(id, value, suffix = '') {
+      const element = document.getElementById(id);
+      if (!element) return;
+      
+      const startValue = 0;
+      const duration = 1000;
+      const increment = (value - startValue) / (duration / 16);
+      let current = startValue;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= value) {
+          current = value;
+          clearInterval(timer);
+        }
+        element.textContent = Math.round(current) + suffix;
+      }, 16);
+    }
+
+    // Enhanced legend builders
+    function buildEnhancedLegends() {
+      // Only build if not already present
+      if (svg.select('#arts-sleep-legend').empty()) {
+        const sleepLegend = svg.append('g')
+          .attr('id', 'arts-sleep-legend')
+          .attr('transform', 'translate(80, 80)');
+          
+        const miniR = [20, 30, 40, 50];
+        sleepLegend.selectAll('circle')
+          .data(miniR)
+          .enter().append('circle')
+          .attr('r', d => d)
+          .attr('fill', 'none')
+          .attr('stroke', '#9b59b6')
+          .attr('stroke-width', 2)
+          .attr('stroke-dasharray', '3,2')
+          .attr('opacity', 0.6);
+          
+        sleepLegend.append('text')
+          .attr('x', 0)
+          .attr('y', 70)
+          .text('Sleep Rings')
+          .attr('text-anchor', 'middle')
+          .style('fill', '#9b59b6')
+          .style('font-size', '14px')
+          .style('font-family', 'Orbitron');
+      }
+
+      if (svg.select('#arts-pressure-legend').empty()) {
+        const pressureLegend = svg.append('g')
+          .attr('id', 'arts-pressure-legend')
+          .attr('transform', `translate(${W - 120}, 80)`);
+          
+        pressureLegend.append('circle')
+          .attr('r', 45)
+          .attr('fill', 'none')
+          .attr('stroke', '#9b59b6')
+          .attr('stroke-width', 2)
+          .attr('opacity', 0.6);
+          
+        for (let p = 1; p <= 5; p++) {
+          const ang = (p - 1) * 2 * Math.PI / 5 - Math.PI / 2;
+          pressureLegend.append('text')
+            .attr('x', Math.cos(ang) * 52)
+            .attr('y', Math.sin(ang) * 52)
+            .attr('text-anchor', 'middle')
+            .attr('dy', '.35em')
+            .text(p)
+            .style('fill', '#9b59b6')
+            .style('font-size', '16px')
+            .style('font-weight', 'bold')
+            .style('font-family', 'Orbitron');
+        }
+        
+        pressureLegend.append('text')
+          .attr('x', 0)
+          .attr('y', 70)
+          .text('Pressure Clock')
+          .attr('text-anchor', 'middle')
+          .style('fill', '#9b59b6')
+          .style('font-size', '14px')
+          .style('font-family', 'Orbitron');
+      }
+    }
+
+    function redrawArtsLabels() {
+      // Remove existing labels
+      g.selectAll('.arts-slabel').remove();
+      g.selectAll('.arts-tickline').remove();
+      
+      // Sleep duration labels
+      g.selectAll('.arts-slabel')
+        .data(sleepOrder)
+        .enter().append('text')
+        .attr('class', 'arts-slabel')
+        .attr('y', (d, i) => (ringR[i][0] + ringR[i][1]) / 2)
+        .attr('dy', '.35em')
+        .attr('text-anchor', 'middle')
+        .text(d => d)
+        .style('fill', '#2c2c2c')
+        .style('font-size', '14px')
+        .style('font-weight', 'bold')
+        .style('font-family', 'Orbitron');
+
+      // Pressure division lines
+      for (let p = 1; p <= 5; p++) {
+        const ang = (p - 1) * 2 * Math.PI / 5;
+        g.append('line')
+          .attr('class', 'arts-tickline')
+          .attr('x1', 0).attr('y1', 0)
+          .attr('x2', Math.cos(ang) * (ringR[3][1] + 15))
+          .attr('y2', Math.sin(ang) * (ringR[3][1] + 15))
+          .attr('stroke', '#4a4a4a')
+          .attr('stroke-width', 1)
+          .attr('opacity', 0.7);
+      }
+    }
+
+    // Event listeners
+    d3.selectAll('#arts-fem, #arts-male, #arts-small').on('change', draw);
+    
+    // Initial render
+    draw();
+    console.log('✅ Arts radial visualization ready!');
+    
+  }).catch(error => {
+    console.error('❌ Error loading arts radial data:', error);
+  });
+}
+
+// Initialize when arts screen is shown
+document.addEventListener('DOMContentLoaded', function() {
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        const artsScreen = document.getElementById('arts-analysis-screen');
+        if (artsScreen && !artsScreen.classList.contains('hidden')) {
+          setTimeout(() => {
+            if (document.getElementById('arts-radial') && !window.artsRadialInitialized) {
+              initializeArtsRadial();
+              window.artsRadialInitialized = true;
+            }
+          }, 500);
+        }
+      }
+    });
+  });
+
+  const artsScreen = document.getElementById('arts-analysis-screen');
+  if (artsScreen) {
+    observer.observe(artsScreen, { attributes: true });
+  }
+});
+
 
 // Enhanced initialization with user assessment integration
 window.onload = () => {

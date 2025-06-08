@@ -604,28 +604,131 @@
       </div>
       <div class="tooltip" id="engineering-tooltip"></div>
 
-    <!-- Arts Analysis Screen -->
     <div id="arts-analysis-screen" class="page hidden">
-      <button class="back-button">← BACK TO PROFILES</button>
-      <div class="container">
-        <h1>🎨 Arts Students: Wellbeing Factors Analysis</h1>
-        <p>Explore how dietary habits and study satisfaction impact mental health among arts students.</p>
-        
-        <section class="chart-section">
-          <h2>Dietary Habits & Depression</h2>
-          <div id="dietary-habits-chart"></div>
-        </section>
-        
-        <section class="chart-section">
-          <h2>Study Satisfaction & Depression</h2>
-          <div id="study-satisfaction-chart"></div>
-        </section>
-        
-        <div class="panel-next-button-container">
-          <button id="next-from-arts" class="next-button">→ View Risk Insights</button>
+
+      <div class="arts-radial-section">
+        <div class="arts-radial-header">
+          <h2 class="radial-title">🎨 Sleep & Pressure Heat Ring Analysis</h2>
+          <p class="radial-description">
+            This circular visualization reveals how sleep patterns and academic pressure intersect to create different mental health outcomes for arts students. 
+            Each ring represents a sleep duration category (inner = less sleep), while segments show academic pressure levels (1-5). 
+            <strong style="color: #ff6f96;">Darker red areas indicate higher depression rates</strong> in that combination.
+          </p>
+          
         </div>
+      
+        <!-- Enhanced Controls -->
+        <div class="arts-controls">
+          <div class="control-group-arts">
+            <h3>🎛️ Filter Options</h3>
+            <div class="checkbox-controls">
+              <label class="arts-checkbox-label">
+                <input type="checkbox" id="arts-fem" checked class="arts-checkbox" />
+                <span class="arts-checkbox-custom"></span>
+                <span class="gender-icon">♀</span>
+                Female Students
+              </label>
+              <label class="arts-checkbox-label">
+                <input type="checkbox" id="arts-male" checked class="arts-checkbox" />
+                <span class="arts-checkbox-custom"></span>
+                <span class="gender-icon">♂</span>
+                Male Students
+              </label>
+              <label class="arts-checkbox-label">
+                <input type="checkbox" id="arts-small" class="arts-checkbox" />
+                <span class="arts-checkbox-custom"></span>
+                <span class="cohort-icon">👥</span>
+                Include Small Groups (< 4 students)
+              </label>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Visualization Container -->
+        <div class="arts-radial-container">
+          <svg id="arts-radial" width="700" height="700"></svg>
+          
+          <!-- Enhanced Legends -->
+          <div class="arts-legends">
+            <div class="legend-section-arts">
+              <h4>💤 Sleep Duration Rings</h4>
+              <div class="sleep-ring-legend">
+                <div class="ring-item">
+                  <div class="ring-visual inner-ring"></div>
+                  <span>&lt; 5 hours (Danger Zone)</span>
+                </div>
+                <div class="ring-item">
+                  <div class="ring-visual second-ring"></div>
+                  <span>5-6 hours (Risk Zone)</span>
+                </div>
+                <div class="ring-item">
+                  <div class="ring-visual third-ring"></div>
+                  <span>7-8 hours (Optimal)</span>
+                </div>
+                <div class="ring-item">
+                  <div class="ring-visual outer-ring"></div>
+                  <span>8+ hours (Excellent)</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="legend-section-arts">
+              <h4>⚡ Academic Pressure Scale</h4>
+              <div class="pressure-clock-legend">
+                <div class="clock-visual">
+                  <div class="clock-center"></div>
+                  <div class="clock-markers">
+                    <span class="pressure-marker p1">1</span>
+                    <span class="pressure-marker p2">2</span>
+                    <span class="pressure-marker p3">3</span>
+                    <span class="pressure-marker p4">4</span>
+                    <span class="pressure-marker p5">5</span>
+                  </div>
+                </div>
+                <p>Segments represent pressure levels 1-5</p>
+              </div>
+            </div>
+            
+            <div class="legend-section-arts">
+              <h4>🌡️ Depression Risk Heat Scale</h4>
+              <div class="heat-scale-legend">
+                <div class="heat-bar"></div>
+                <div class="heat-labels">
+                  <span>0% Low Risk</span>
+                  <span>50% Moderate</span>
+                  <span>100% High Risk</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Stats Dashboard -->
+        <div class="arts-stats-dashboard">
+          <div class="stat-card-arts">
+            <div class="stat-number" id="arts-total-students">0</div>
+            <div class="stat-label">Arts Students Analyzed</div>
+          </div>
+          <div class="stat-card-arts">
+            <div class="stat-number" id="arts-avg-depression">0%</div>
+            <div class="stat-label">Average Depression Rate</div>
+          </div>
+          <div class="stat-card-arts">
+            <div class="stat-number" id="arts-high-risk">0</div>
+            <div class="stat-label">High-Risk Combinations</div>
+          </div>
+          <div class="stat-card-arts">
+            <div class="stat-number" id="arts-optimal-sleep">0%</div>
+            <div class="stat-label">Getting Optimal Sleep (7-8h)</div>
+          </div>
+        </div>
+
+        <button id="next-from-arts" class="next-button">→ View Risk Insights</button>
+
       </div>
-    </div>
+      
+      <!-- Interactive Tooltip -->
+      <div id="arts-radial-tooltip" class="arts-tooltip"></div>
 
     <!-- Medicine Analysis Screen -->
     <div id="medicine-analysis-screen" class="page hidden">
@@ -635,6 +738,99 @@
         <p>Explore how sleep patterns, academic pressure, and study hours create a complex spiral of mental health outcomes for medicine students.</p>
         
         <!-- The medicine spiral content will be dynamically created here by medicine-spiral.js -->
+
+        <div class="medicine-matrix-section">
+          <h2 class="matrix-title">🔬 Academic Pressure vs Sleep Wellness Matrix</h2>
+          <p class="matrix-description">
+            This interactive matrix reveals how academic pressure and sleep duration create different wellness outcomes for medicine students. 
+            Each dot represents a group of students - size shows study satisfaction, color shows depression rate.
+          </p>
+        
+          <!-- Enhanced Controls -->
+          <div class="matrix-controls">
+            <div class="control-group">
+              <label class="control-label">
+                <span class="control-icon">🎓</span>
+                Degree Focus:
+                <select id="medicine-degree-select" class="matrix-select">
+                  <option value="All">All Medicine Students</option>
+                </select>
+              </label>
+            </div>
+            
+            <div class="control-group">
+              <span class="control-label">
+                <span class="control-icon">👥</span>
+                Gender Analysis:
+              </span>
+              <label class="checkbox-label">
+                <input type="checkbox" id="medicine-show-females" checked class="matrix-checkbox" />
+                <span class="checkbox-custom"></span>
+                Female Students
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="medicine-show-males" checked class="matrix-checkbox" />
+                <span class="checkbox-custom"></span>
+                Male Students
+              </label>
+            </div>
+          </div>
+        
+          <!-- Matrix Visualization Container -->
+          <div class="medicine-matrix-container">
+            <svg id="medicine-matrix-plot" width="900" height="540"></svg>
+            
+            <!-- Enhanced Legend -->
+            <div class="matrix-legend">
+              <div class="legend-section">
+                <h4>Depression Risk Scale</h4>
+                <div class="color-legend">
+                  <div class="color-bar"></div>
+                  <div class="color-labels">
+                    <span>0% Low Risk</span>
+                    <span>50% Moderate</span>
+                    <span>100% High Risk</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="legend-section">
+                <h4>Study Satisfaction</h4>
+                <div class="size-legend">
+                  <div class="size-examples">
+                    <div class="size-dot small"></div>
+                    <span>Low Satisfaction</span>
+                    <div class="size-dot medium"></div>
+                    <span>Average</span>
+                    <div class="size-dot large"></div>
+                    <span>High Satisfaction</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="legend-section">
+                <h4>Key Insights</h4>
+                <div class="insight-bullets">
+                  <div class="insight-item">
+                    <span class="insight-dot danger"></span>
+                    <span>Danger Zone: High pressure + Low sleep</span>
+                  </div>
+                  <div class="insight-item">
+                    <span class="insight-dot optimal"></span>
+                    <span>Sweet Spot: Moderate pressure + 7-8 hours sleep</span>
+                  </div>
+                  <div class="insight-item">
+                    <span class="insight-dot protective"></span>
+                    <span>Protective: Adequate sleep buffers high pressure</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <!-- Interactive Tooltip -->
+          <div id="medicine-matrix-tooltip" class="matrix-tooltip"></div>
+        </div>
         
         <div class="panel-next-button-container">
           <button id="next-from-medicine" class="next-button">→ View Risk Insights</button>

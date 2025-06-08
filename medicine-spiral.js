@@ -2,47 +2,79 @@
 
 const MedicineSpiral = {
 
-data: {
-    all: [],
-    filtered: [],
-    currentDegree: 'all',
-    currentPressure: 10,
-    sleepToRadius: {
-      'Less than 5 hours': 80,        
-      '5-6 hours': 140,               
-      '7-8 hours': 220,               
-      'More than 8 hours': 300,      
-      'Unknown': 180,                 
-      'less than 5 hours': 80,
-      '5-6': 140,
-      '7-8': 220,
-      'more than 8 hours': 300
-    }
-  },
-    
-    // Main render function
-    render: function() {
-      // Clear any existing content
-      d3.select("#medicine-analysis-screen .container").selectAll(".spiral-content").remove();
-      d3.select("#spiral-container").selectAll("*").remove(); // Add this line
-  
-    // Clear any existing tooltips
-    d3.selectAll('.medicine-spiral-tooltip').remove(); // Add this line
-      
-      // Create the main container structure
-      const mainContainer = d3.select("#medicine-analysis-screen .container");
-      const spiralContent = mainContainer.append("div").attr("class", "spiral-content");
-      
-      // Build the UI
-      this.createControls(spiralContent);
-      this.createSVGContainer(spiralContent);
-      this.createLegends(spiralContent);
-      this.createStats(spiralContent);
-      this.createTooltip();
-      
-      // Load and process the data
-      this.loadData();
+  data: {
+      all: [],
+      filtered: [],
+      currentDegree: 'all',
+      currentPressure: 10,
+      sleepToRadius: {
+        'Less than 5 hours': 80,        
+        '5-6 hours': 140,               
+        '7-8 hours': 220,               
+        'More than 8 hours': 300,      
+        'Unknown': 180,                 
+        'less than 5 hours': 80,
+        '5-6': 140,
+        '7-8': 220,
+        'more than 8 hours': 300
+      }
     },
+      
+      // Main render function
+      render: function() {
+        // Clear any existing content
+        d3.select("#medicine-analysis-screen .container").selectAll(".spiral-content").remove();
+        d3.select("#spiral-container").selectAll("*").remove();
+        d3.selectAll('.medicine-spiral-tooltip').remove();
+        
+        // Create the main container structure
+        const mainContainer = d3.select("#medicine-analysis-screen .container");
+        const spiralContent = mainContainer.append("div").attr("class", "spiral-content");
+        
+        // Build the UI with enhanced header
+        this.createHeader(spiralContent);
+        this.createControls(spiralContent);
+        this.createSVGContainer(spiralContent);
+        this.createLegends(spiralContent);
+        this.createStats(spiralContent);
+        this.createTooltip();
+        
+        // Load and process the data
+        this.loadData();
+      },
+      
+      // NEW: Create enhanced header with title and description
+      createHeader: function(container) {
+        const header = container.append("div")
+          .attr("class", "spiral-header")
+          .style("text-align", "center")
+          .style("margin-bottom", "2rem")
+          .style("padding", "2rem")
+          .style("background", "rgba(0, 0, 0, 0.7)")
+          .style("border", "2px solid #00ffcc")
+          .style("border-radius", "15px")
+          .style("box-shadow", "0 0 20px rgba(0, 255, 204, 0.3)");
+        
+        // Main title
+        header.append("h2")
+          .attr("class", "spiral-title")
+          .style("color", "#00ffcc")
+          .style("font-size", "2rem")
+          .style("font-family", "Orbitron, monospace")
+          .style("margin-bottom", "1rem")
+          .style("text-shadow", "0 0 10px rgba(0, 255, 204, 0.5)")
+          .html("🌀 The Mental Health Spiral: Sleep vs Academic Pressure");
+        
+        // Descriptive text
+        header.append("p")
+          .attr("class", "spiral-description")
+          .style("color", "#ffffff")
+          .style("font-size", "1.1rem")
+          .style("line-height", "1.6")
+          .style("max-width", "800px")
+          .style("margin", "0 auto 1rem auto")
+          .html("This visualization reveals how sleep deprivation creates a dangerous spiral for medicine students. Each dot represents a student - their <strong style='color: #00ff00;'>distance from center shows sleep hours</strong>, while <strong style='color: #ffff00;'>dot size represents study hours</strong>. Notice how students closest to the center (danger zone) often struggle with both sleep and mental health.");
+      },
     
     createControls: function(container) {
       const controls = container.append("div")
