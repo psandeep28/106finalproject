@@ -548,7 +548,6 @@
       </div>
     </div>
 
-
     <!-- Timeline Screen for Business Profile -->
     <div id="timeline-screen" class="page hidden">
       <button class="back-button">← BACK TO PROFILES</button>
@@ -604,8 +603,10 @@
       </div>
       <div class="tooltip" id="engineering-tooltip"></div>
 
+    <!-- Arts Analysis Screen -->
     <div id="arts-analysis-screen" class="page hidden">
-
+      <button class="back-button">← BACK TO PROFILES</button>
+      
       <div class="arts-radial-section">
         <div class="arts-radial-header">
           <h2 class="radial-title">🎨 Sleep & Pressure Heat Ring Analysis</h2>
@@ -614,7 +615,6 @@
             Each ring represents a sleep duration category (inner = less sleep), while segments show academic pressure levels (1-5). 
             <strong style="color: #ff6f96;">Darker red areas indicate higher depression rates</strong> in that combination.
           </p>
-          
         </div>
       
         <!-- Enhanced Controls -->
@@ -650,28 +650,6 @@
           
           <!-- Enhanced Legends -->
           <div class="arts-legends">
-            <div class="legend-section-arts">
-              <h4>💤 Sleep Duration Rings</h4>
-              <div class="sleep-ring-legend">
-                <div class="ring-item">
-                  <div class="ring-visual inner-ring"></div>
-                  <span>&lt; 5 hours (Danger Zone)</span>
-                </div>
-                <div class="ring-item">
-                  <div class="ring-visual second-ring"></div>
-                  <span>5-6 hours (Risk Zone)</span>
-                </div>
-                <div class="ring-item">
-                  <div class="ring-visual third-ring"></div>
-                  <span>7-8 hours (Optimal)</span>
-                </div>
-                <div class="ring-item">
-                  <div class="ring-visual outer-ring"></div>
-                  <span>8+ hours (Excellent)</span>
-                </div>
-              </div>
-            </div>
-            
             <div class="legend-section-arts">
               <h4>⚡ Academic Pressure Scale</h4>
               <div class="pressure-clock-legend">
@@ -723,12 +701,14 @@
           </div>
         </div>
 
-        <button id="next-from-arts" class="next-button">→ View Risk Insights</button>
-
+        <div class="panel-next-button-container">
+          <button id="next-from-arts" class="next-button">→ View Risk Insights</button>
+        </div>
       </div>
       
       <!-- Interactive Tooltip -->
       <div id="arts-radial-tooltip" class="arts-tooltip"></div>
+    </div>
 
     <!-- Medicine Analysis Screen -->
     <div id="medicine-analysis-screen" class="page hidden">
@@ -902,17 +882,17 @@
         </section>
 
         <div class="panel-next-button-container">
-          <button id="next-to-user" class="next-button">→ Start Your Personal Assessment</button>
+          <button id="next-to-user" class="next-button">→ Start Your Journey</button>
         </div>
       </div>
     </div>
 
-    <!-- Scripts - FIXED VERSION -->
+    <!-- Scripts - COMPLETE VERSION WITH ALL NAVIGATION FIXES -->
     <script type="module" src="./user-model.js"></script>
     <script type="module" src="./script.js"></script>
     <script type="module" src="post-assessment.js"></script>
-    <script type="module">
-      // Simple, working event listeners
+    <script>
+      // Basic navigation functions
       function startGame() {
         console.log('Starting game...');
         document.getElementById("welcome-screen").classList.add("hidden");
@@ -937,6 +917,7 @@
       document.addEventListener('DOMContentLoaded', () => {
         console.log('DOM loaded, setting up event listeners...');
         
+        // Basic navigation
         const backBtn = document.getElementById('back-button');
         const startBtn = document.getElementById('start-button');
         
@@ -954,7 +935,63 @@
           console.error('Start button not found!');
         }
 
-        console.log('✅ Basic navigation set up successfully');
+        // NAVIGATION FIXES FOR "VIEW RISK INSIGHTS" BUTTONS
+        const nextToRiskBtn = document.getElementById("next-to-risk");
+        if (nextToRiskBtn) {
+          nextToRiskBtn.addEventListener("click", function() {
+            console.log('📊 Navigating to risk insights...');
+            document.getElementById("timeline-screen").classList.add("hidden");
+            document.getElementById("risk-panels-screen").classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          console.log('✅ Business timeline navigation fixed');
+        }
+
+        const nextFromEngineeringBtn = document.getElementById("next-from-engineering");
+        if (nextFromEngineeringBtn) {
+          nextFromEngineeringBtn.addEventListener("click", function() {
+            console.log('🔧 Navigating from engineering to risk insights...');
+            document.getElementById("engineering-matrix-screen").classList.add("hidden");
+            document.getElementById("risk-panels-screen").classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          console.log('✅ Engineering navigation fixed');
+        }
+
+        const nextFromArtsBtn = document.getElementById("next-from-arts");
+        if (nextFromArtsBtn) {
+          nextFromArtsBtn.addEventListener("click", function() {
+            console.log('🎨 Navigating from arts to risk insights...');
+            document.getElementById("arts-analysis-screen").classList.add("hidden");
+            document.getElementById("risk-panels-screen").classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          console.log('✅ Arts navigation fixed');
+        }
+
+        const nextFromMedicineBtn = document.getElementById("next-from-medicine");
+        if (nextFromMedicineBtn) {
+          nextFromMedicineBtn.addEventListener("click", function() {
+            console.log('🏥 Navigating from medicine to risk insights...');
+            document.getElementById("medicine-analysis-screen").classList.add("hidden");
+            document.getElementById("risk-panels-screen").classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          console.log('✅ Medicine navigation fixed');
+        }
+
+        const nextToUserBtn = document.getElementById("next-to-user");
+        if (nextToUserBtn) {
+          nextToUserBtn.addEventListener("click", function() {
+            console.log('👤 Navigating to user assessment...');
+            document.getElementById("risk-panels-screen").classList.add("hidden");
+            document.getElementById("user-profile").classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          console.log('✅ User assessment navigation fixed');
+        }
+
+        console.log('🎯 All navigation fixes applied successfully!');
       });
     </script>
 
