@@ -1107,3 +1107,545 @@ body::before {
   font-family: 'Orbitron', monospace;
   z-index: 1000;
 }
+
+/* Post-Assessment Comparison Styles */
+.comparison-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid #00ffff;
+  border-radius: 15px;
+}
+
+.comparison-subtitle {
+  color: #ffffff;
+  font-size: 1.2rem;
+  margin-top: 1rem;
+}
+
+.user-highlight {
+  color: #00ff00;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+/* Sleep Comparison Styles */
+.sleep-comparison-content {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.user-spotlight {
+  display: flex;
+  justify-content: center;
+}
+
+.you-card {
+  background: linear-gradient(135deg, #00ff00, #00ffff);
+  color: #000;
+  padding: 2rem;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+  animation: youGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes youGlow {
+  from { box-shadow: 0 0 20px rgba(0, 255, 0, 0.3); }
+  to { box-shadow: 0 0 40px rgba(0, 255, 0, 0.6); }
+}
+
+.you-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.you-card h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.you-sleep {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.you-position {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.population-visualization h3 {
+  color: #00ffff;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.population-chart {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+  border-radius: 15px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sleep-insights-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.insight-card {
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid #00ff00;
+  border-radius: 15px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.insight-card.positive {
+  border-color: #00ff00;
+  background: rgba(0, 255, 0, 0.1);
+}
+
+.insight-icon {
+  font-size: 2rem;
+  color: #00ff00;
+}
+
+.insight-content h4 {
+  color: #00ff00;
+  margin-bottom: 0.5rem;
+}
+
+.stats-comparison {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #00ffff;
+  font-family: 'Orbitron', monospace;
+  margin-bottom: 0.5rem;
+}
+
+.stat-number.depression-diff {
+  color: #00ff00;
+}
+
+.stat-label {
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+/* Stress Profile Comparison Styles */
+.stress-profile-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.stress-radar-section {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+  border-radius: 15px;
+  padding: 2rem;
+}
+
+.stress-radar-section h3 {
+  color: #00ffff;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.radar-comparison {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stress-radar {
+  width: 300px;
+  height: 300px;
+  margin-bottom: 2rem;
+}
+
+.radar-legend {
+  display: flex;
+  gap: 2rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.you-color { background: #00ffff; }
+.average-color { background: #666; }
+
+.factor-analysis h3 {
+  color: #00ffff;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.factor-comparisons {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.factor-comparison {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #333;
+  border-radius: 15px;
+  padding: 1.5rem;
+}
+
+.factor-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.factor-icon {
+  font-size: 1.5rem;
+}
+
+.factor-name {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.comparison-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.bar-container {
+  display: grid;
+  grid-template-columns: 80px 1fr 50px;
+  align-items: center;
+  gap: 1rem;
+}
+
+.bar-label {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.comparison-bar {
+  height: 12px;
+  background: #333;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s ease;
+}
+
+.you-fill {
+  background: #00ffff;
+}
+
+.you-fill.protective {
+  background: #00ff00;
+}
+
+.avg-fill {
+  background: #666;
+}
+
+.bar-value {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.factor-insight {
+  color: #999;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* Peer Matching Styles */
+.peer-matching-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.similarity-score {
+  text-align: center;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid #00ffff;
+  border-radius: 20px;
+  padding: 2rem;
+}
+
+.score-circle {
+  margin-bottom: 2rem;
+}
+
+.score-number {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #00ffff;
+  font-family: 'Orbitron', monospace;
+  display: block;
+}
+
+.score-label {
+  color: #ffffff;
+  font-size: 1.2rem;
+}
+
+.match-quality {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.match-bar {
+  width: 300px;
+  height: 12px;
+  background: #333;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.match-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff00, #00ffff);
+  border-radius: 6px;
+  transition: width 1s ease;
+}
+
+.match-percentage {
+  color: #00ff00;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.peer-characteristics h3 {
+  color: #00ffff;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.characteristic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.characteristic-card {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+  border-radius: 15px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.char-icon {
+  font-size: 2rem;
+  color: #00ffff;
+}
+
+.char-content h4 {
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.highlight-stat {
+  color: #00ff00;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.peer-outcomes h3 {
+  color: #00ffff;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.outcomes-visualization {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.outcome-donut {
+  display: flex;
+  justify-content: center;
+}
+
+.outcome-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.outcome-stat {
+  padding: 1.5rem;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.outcome-stat.positive {
+  background: rgba(0, 255, 0, 0.1);
+  border: 2px solid #00ff00;
+}
+
+.outcome-stat.concerning {
+  background: rgba(255, 107, 107, 0.1);
+  border: 2px solid #ff6b6b;
+}
+
+.outcome-number {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: bold;
+  font-family: 'Orbitron', monospace;
+  margin-bottom: 0.5rem;
+}
+
+.outcome-stat.positive .outcome-number {
+  color: #00ff00;
+}
+
+.outcome-stat.concerning .outcome-number {
+  color: #ff6b6b;
+}
+
+.outcome-label {
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.outcome-insight {
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid #00ffff;
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.outcome-insight p {
+  color: #ffffff;
+  margin: 0;
+  text-align: center;
+}
+
+/* Footer Buttons */
+.comparison-footer {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #333;
+}
+
+.comparison-next-btn, .comparison-final-btn {
+  background: linear-gradient(45deg, #00ff00, #00ffff);
+  color: #000;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  font-family: 'Orbitron', monospace;
+  text-transform: uppercase;
+}
+
+.comparison-final-btn {
+  background: linear-gradient(45deg, #ff00ff, #00ffff);
+  animation: finalGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes finalGlow {
+  from { box-shadow: 0 0 20px rgba(255, 0, 255, 0.3); }
+  to { box-shadow: 0 0 30px rgba(255, 0, 255, 0.6); }
+}
+
+.comparison-next-btn:hover, .comparison-final-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.btn-arrow {
+  transition: transform 0.3s ease;
+}
+
+.comparison-next-btn:hover .btn-arrow,
+.comparison-final-btn:hover .btn-arrow {
+  transform: translateX(5px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sleep-comparison-content,
+  .stress-profile-content,
+  .outcomes-visualization {
+    grid-template-columns: 1fr;
+  }
+  
+  .sleep-insights-grid,
+  .characteristic-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .bar-container {
+    grid-template-columns: 60px 1fr 40px;
+  }
+}

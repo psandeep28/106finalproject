@@ -6,22 +6,11 @@
     <title>Career Path Chronicles</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.0.0/dist/tf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-    <script type="module" src="./user-ineract.js"></script>
-    <script type="module" src="./script.js"></script>
     <script src="medicine-spiral.js"></script>
-
   </head>
   <body>
-    <script type="module">
-      import { startGame, goBack } from './script.js';
-      let backbtn = document.getElementsByClassName('back-button')[0];
-      let strtbtn = document.getElementsByClassName('start-button')[0];
-      console.log(strtbtn);
-      backbtn.addEventListener('click', goBack);
-      strtbtn.addEventListener('click', startGame);
-    </script>
-
     <!-- Welcome Screen -->
     <div id="welcome-screen" class="page">
       <div class="background"></div>
@@ -34,14 +23,14 @@
           <p>Explore how different factors like <span class="highlight">sleep patterns</span>, <span class="highlight">academic pressure</span>, and <span class="highlight">financial stress</span> influence depression risk across career fields.</p>
           <p>Navigate through data-driven visualizations to discover insights that can help guide students toward healthier paths.</p>
         </div>
-        <button class="start-button">► START EXPLORATION</button>
+        <button class="start-button" id="start-button">► START EXPLORATION</button>
       </div>
       <div class="credits">Data Visualization Project | DSC 106 Final</div>
     </div>
 
     <!-- Profiles Page -->
     <div id="profiles-screen" class="page hidden">
-      <button class="back-button">← BACK</button>
+      <button class="back-button" id="back-button">← BACK</button>
       <div class="container">
         <div class="header">
           <h1 class="page-title">CAREER PROFILE ANALYSIS</h1>
@@ -86,51 +75,479 @@
       </div>
     </div>
 
-    <!-- User Profile Input Page -->
-    <div id="user-profile" class="hidden">
-      <h2>How are you feeling?</h2>
-      <p class="instruction">Rate where you fall below to get a prediction of your major, and where your risk falls relative to the other majors</p>
-      <div id="user-chart"></div>
-      <div id="user-input">
-        <!-- TODO: Rearange the order of this to be more intuitive for
-        a user looking at the chart -->
-        <div class="userin slider">
-          <p>Academic Pressure:</p>
-          <input class='user-input slider-input' id="ac-pressure" name="Academic Pressure" type="range" min=0 max=100 value="0"/>
-          <label class="value" for=""></label>
+    <!-- Enhanced User Profile Input Page -->
+    <div id="user-profile" class="page hidden">
+      <div class="assessment-container">
+        <div class="assessment-header">
+          <div class="step-indicator">
+            <div class="step current">1</div>
+            <div class="step-line"></div>
+            <div class="step">2</div>
+            <div class="step-line"></div>
+            <div class="step">3</div>
+            <div class="step-line"></div>
+            <div class="step">4</div>
+          </div>
+          <h2 class="assessment-title">
+            <span class="title-icon">🎯</span>
+            Personal Risk Assessment
+          </h2>
+          <p class="assessment-subtitle">
+            Help us understand your situation to provide personalized insights
+          </p>
         </div>
-        <div class="userin slider">
-          <p>Financial Stress:</p>
-          <input class='user-input slider-input' id="fin-stress" name="Financial Stress" type="range" min=0 max=100 value="0"/>
-          <label class="value" for=""></label>
+
+        <div class="assessment-content">
+          <div class="assessment-left">
+            <div class="radar-container">
+              <div id="user-chart" class="chart-container"></div>
+              <div class="chart-legend">
+                <div class="legend-item">
+                  <span class="legend-dot academic"></span>
+                  Academic Pressure
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot financial"></span>
+                  Financial Stress
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot balance"></span>
+                  Work-Life Balance
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot support"></span>
+                  Social Support
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot security"></span>
+                  Job Security
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="assessment-right">
+            <div class="assessment-form">
+              <div class="form-section">
+                <h3>Stress Factors</h3>
+                
+                <div class="input-group">
+                  <label for="ac-pressure">Academic Pressure</label>
+                  <div class="slider-container">
+                    <input type="range" id="ac-pressure" name="Academic Pressure" 
+                           class="assessment-slider" min="0" max="100" value="50">
+                    <div class="slider-labels">
+                      <span>Low</span>
+                      <span class="slider-value" id="ac-pressure-value">50</span>
+                      <span>High</span>
+                    </div>
+                  </div>
+                  <div class="input-hint">How overwhelmed do you feel by academic demands?</div>
+                </div>
+
+                <div class="input-group">
+                  <label for="fin-stress">Financial Stress</label>
+                  <div class="slider-container">
+                    <input type="range" id="fin-stress" name="Financial Stress" 
+                           class="assessment-slider" min="0" max="100" value="50">
+                    <div class="slider-labels">
+                      <span>Secure</span>
+                      <span class="slider-value" id="fin-stress-value">50</span>
+                      <span>Stressed</span>
+                    </div>
+                  </div>
+                  <div class="input-hint">How worried are you about money and expenses?</div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3>Support Systems</h3>
+                
+                <div class="input-group">
+                  <label for="wl-balance">Work-Life Balance</label>
+                  <div class="slider-container">
+                    <input type="range" id="wl-balance" name="Work-Life Balance" 
+                           class="assessment-slider" min="0" max="100" value="50">
+                    <div class="slider-labels">
+                      <span>Poor</span>
+                      <span class="slider-value" id="wl-balance-value">50</span>
+                      <span>Excellent</span>
+                    </div>
+                  </div>
+                  <div class="input-hint">How well do you balance work/study with personal time?</div>
+                </div>
+
+                <div class="input-group">
+                  <label for="soc-supp">Social Support</label>
+                  <div class="slider-container">
+                    <input type="range" id="soc-supp" name="Social Support" 
+                           class="assessment-slider" min="0" max="100" value="50">
+                    <div class="slider-labels">
+                      <span>Isolated</span>
+                      <span class="slider-value" id="soc-supp-value">50</span>
+                      <span>Supported</span>
+                    </div>
+                  </div>
+                  <div class="input-hint">How connected do you feel to friends, family, and community?</div>
+                </div>
+
+                <div class="input-group">
+                  <label for="job-sec">Job Security</label>
+                  <div class="slider-container">
+                    <input type="range" id="job-sec" name="Job Security" 
+                           class="assessment-slider" min="0" max="100" value="50">
+                    <div class="slider-labels">
+                      <span>Uncertain</span>
+                      <span class="slider-value" id="job-sec-value">50</span>
+                      <span>Confident</span>
+                    </div>
+                  </div>
+                  <div class="input-hint">How confident are you about your career prospects?</div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3>Sleep Patterns</h3>
+                
+                <div class="input-group">
+                  <label for="sleep-amnt">Average Sleep per Night</label>
+                  <select id="sleep-amnt" name="Amount of Sleep" class="assessment-select">
+                    <option value="5">Less than 5 Hours</option>
+                    <option value="5-6">5–6 Hours</option>
+                    <option value="7-8" selected>7–8 Hours</option>
+                    <option value="8">More than 8 Hours</option>
+                  </select>
+                  <div class="input-hint">Quality sleep is crucial for mental health</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="userin slider">
-          <p>Work-Life Balance:</p>
-          <input class='user-input slider-input' id="wl-balance" name="Work-Life Balance" type="range" min=0 max=100 value="0"/>
-          <label class="value" for=""></label>
-        </div>
-        <div class="userin slider">
-          <p>Social Support:</p>
-          <input class='user-input slider-input' id="soc-supp" name="Social Support" type="range" min=0 max=100 value="0"/>
-          <label class="value" for=""></label>
-        </div>
-        <div class="userin slider">
-          <p>Job Securiry:</p>
-          <input class='user-input slider-input' id="job-sec" name="Job Security" type="range" min=0 max=100 value="0"/>
-          <label class="value" for=""></label>
-        </div>
-        <div class="userin">
-          <p>Amount of Sleep per night</p>
-          <select class='user-input drop-input' id="sleep-amnt" name="Amount of Sleep">
-            <option value="5">Less than 5 Hours</option>
-            <option value="5-6">5–6 Hours</option>
-            <option value="7-8">7–8 Hours</option>
-            <option value="8">More than 8 Hours</option>
-          </select>
+
+        <div class="assessment-footer">
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" id="assessment-progress"></div>
+            </div>
+            <div class="progress-text" id="progress-text">Adjust the sliders to see your profile</div>
+          </div>
+          
+          <button id="complete-assessment-btn" class="assessment-button" disabled>
+            <span class="button-icon">🎯</span>
+            <span class="button-text">Analyze My Risk Profile</span>
+            <span class="button-arrow">→</span>
+          </button>
+          
+          <div class="privacy-note">
+            <span class="privacy-icon">🔒</span>
+            Your responses are confidential and used only for this assessment
+          </div>
         </div>
       </div>
-      <div id="user-sleep"></div>
     </div>
+
+    <div id="your-sleep-comparison" class="page hidden">
+      <div class="container">
+        <div class="comparison-header">
+          <h1 class="page-title">😴 Your Sleep Pattern vs 27,901 Students</h1>
+          <p class="comparison-subtitle">Let's see how your <span class="user-highlight" id="user-sleep-display">7-8 hours</span> of sleep compares</p>
+        </div>
+    
+        <div class="sleep-comparison-content">
+          <div class="user-spotlight">
+            <div class="you-card">
+              <div class="you-icon">👤</div>
+              <h3>YOU</h3>
+              <div class="you-sleep" id="you-sleep-hours">7-8 hours</div>
+              <div class="you-position">Optimal Range</div>
+            </div>
+          </div>
+    
+          <div class="population-visualization">
+            <h3>Where You Stand in the Population</h3>
+            <div id="sleep-population-chart" class="population-chart">
+              <!-- Dynamic chart will be inserted here -->
+            </div>
+            
+            <div class="sleep-insights-grid">
+              <div class="insight-card positive" id="sleep-insight-card">
+                <div class="insight-icon">💡</div>
+                <div class="insight-content">
+                  <h4>Your Sleep Advantage</h4>
+                  <p id="sleep-advantage-text">You're in the 33% of students who get optimal sleep!</p>
+                </div>
+              </div>
+              
+              <div class="stats-comparison">
+                <div class="stat-item">
+                  <span class="stat-number" id="your-group-size">9,184</span>
+                  <span class="stat-label">students sleep like you</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number" id="your-group-depression">42.1%</span>
+                  <span class="stat-label">depression rate in your sleep group</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number depression-diff" id="depression-difference">-16.5%</span>
+                  <span class="stat-label">vs. average depression rate</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <div class="comparison-footer">
+          <button id="next-to-stress-comparison" class="comparison-next-btn">
+            <span class="btn-icon">⚡</span>
+            See Your Stress Profile
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Screen 2: Your Stress Profile vs Dataset -->
+    <div id="your-stress-comparison" class="page hidden">
+      <div class="container">
+        <div class="comparison-header">
+          <h1 class="page-title">⚡ Your Stress Profile Breakdown</h1>
+          <p class="comparison-subtitle">How your stress levels compare to thousands of other students</p>
+        </div>
+    
+        <div class="stress-profile-content">
+          <div class="stress-radar-section">
+            <h3>Your Stress Signature</h3>
+            <div class="radar-comparison">
+              <div id="user-stress-radar" class="stress-radar"></div>
+              <div class="radar-legend">
+                <div class="legend-item">
+                  <span class="legend-dot you-color"></span>
+                  Your Profile
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot average-color"></span>
+                  Average Student
+                </div>
+              </div>
+            </div>
+          </div>
+    
+          <div class="factor-analysis">
+            <h3>Factor-by-Factor Breakdown</h3>
+            <div class="factor-comparisons">
+              
+              <div class="factor-comparison">
+                <div class="factor-header">
+                  <span class="factor-icon">📚</span>
+                  <span class="factor-name">Academic Pressure</span>
+                </div>
+                <div class="comparison-bars">
+                  <div class="bar-container">
+                    <div class="bar-label">You</div>
+                    <div class="comparison-bar you-bar">
+                      <div class="bar-fill you-fill" id="you-academic-bar" style="width: 70%"></div>
+                      <span class="bar-value" id="you-academic-value">70</span>
+                    </div>
+                  </div>
+                  <div class="bar-container">
+                    <div class="bar-label">Average</div>
+                    <div class="comparison-bar avg-bar">
+                      <div class="bar-fill avg-fill" style="width: 65.2%"></div>
+                      <span class="bar-value">65.2</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="factor-insight" id="academic-insight">
+                  You're slightly above average in academic pressure
+                </div>
+              </div>
+    
+              <div class="factor-comparison">
+                <div class="factor-header">
+                  <span class="factor-icon">💰</span>
+                  <span class="factor-name">Financial Stress</span>
+                </div>
+                <div class="comparison-bars">
+                  <div class="bar-container">
+                    <div class="bar-label">You</div>
+                    <div class="comparison-bar you-bar">
+                      <div class="bar-fill you-fill" id="you-financial-bar" style="width: 45%"></div>
+                      <span class="bar-value" id="you-financial-value">45</span>
+                    </div>
+                  </div>
+                  <div class="bar-container">
+                    <div class="bar-label">Average</div>
+                    <div class="comparison-bar avg-bar">
+                      <div class="bar-fill avg-fill" style="width: 52.8%"></div>
+                      <span class="bar-value">52.8</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="factor-insight" id="financial-insight">
+                  You have lower financial stress than most students
+                </div>
+              </div>
+    
+              <div class="factor-comparison">
+                <div class="factor-header">
+                  <span class="factor-icon">⚖️</span>
+                  <span class="factor-name">Work-Life Balance</span>
+                </div>
+                <div class="comparison-bars">
+                  <div class="bar-container">
+                    <div class="bar-label">You</div>
+                    <div class="comparison-bar you-bar">
+                      <div class="bar-fill you-fill protective" id="you-balance-bar" style="width: 75%"></div>
+                      <span class="bar-value" id="you-balance-value">75</span>
+                    </div>
+                  </div>
+                  <div class="bar-container">
+                    <div class="bar-label">Average</div>
+                    <div class="comparison-bar avg-bar">
+                      <div class="bar-fill avg-fill" style="width: 48.3%"></div>
+                      <span class="bar-value">48.3</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="factor-insight" id="balance-insight">
+                  Your work-life balance is significantly better than average
+                </div>
+              </div>
+    
+              <div class="factor-comparison">
+                <div class="factor-header">
+                  <span class="factor-icon">🤝</span>
+                  <span class="factor-name">Social Support</span>
+                </div>
+                <div class="comparison-bars">
+                  <div class="bar-container">
+                    <div class="bar-label">You</div>
+                    <div class="comparison-bar you-bar">
+                      <div class="bar-fill you-fill protective" id="you-social-bar" style="width: 80%"></div>
+                      <span class="bar-value" id="you-social-value">80</span>
+                    </div>
+                  </div>
+                  <div class="bar-container">
+                    <div class="bar-label">Average</div>
+                    <div class="comparison-bar avg-bar">
+                      <div class="bar-fill avg-fill" style="width: 61.7%"></div>
+                      <span class="bar-value">61.7</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="factor-insight" id="social-insight">
+                  You feel more supported than most students
+                </div>
+              </div>
+    
+            </div>
+          </div>
+        </div>
+    
+        <div class="comparison-footer">
+          <button id="next-to-peer-match" class="comparison-next-btn">
+            <span class="btn-icon">👥</span>
+            Find Your Student Matches
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Screen 3: Find Students Most Like You -->
+    <div id="peer-matching-screen" class="page hidden">
+      <div class="container">
+        <div class="comparison-header">
+          <h1 class="page-title">👥 Students Most Like You</h1>
+          <p class="comparison-subtitle">Based on your responses, here are your closest matches in the dataset</p>
+        </div>
+    
+        <div class="peer-matching-content">
+          <div class="similarity-score">
+            <div class="score-circle">
+              <div class="score-number" id="similarity-score">847</div>
+              <div class="score-label">similar students found</div>
+            </div>
+            <div class="match-quality">
+              <div class="match-bar">
+                <div class="match-fill" id="match-quality-bar" style="width: 92%"></div>
+              </div>
+              <span class="match-percentage">92% similarity match</span>
+            </div>
+          </div>
+    
+          <div class="peer-characteristics">
+            <h3>Your Peer Group Characteristics</h3>
+            <div class="characteristic-grid">
+              
+              <div class="characteristic-card">
+                <div class="char-icon">😴</div>
+                <div class="char-content">
+                  <h4>Sleep Pattern</h4>
+                  <p><span class="highlight-stat">78%</span> sleep 7-8 hours like you</p>
+                </div>
+              </div>
+    
+              <div class="characteristic-card">
+                <div class="char-icon">📚</div>
+                <div class="char-content">
+                  <h4>Academic Load</h4>
+                  <p><span class="highlight-stat">65%</span> report similar academic pressure</p>
+                </div>
+              </div>
+    
+              <div class="characteristic-card">
+                <div class="char-icon">🤝</div>
+                <div class="char-content">
+                  <h4>Support Systems</h4>
+                  <p><span class="highlight-stat">71%</span> have strong social support</p>
+                </div>
+              </div>
+    
+              <div class="characteristic-card">
+                <div class="char-icon">⚖️</div>
+                <div class="char-content">
+                  <h4>Life Balance</h4>
+                  <p><span class="highlight-stat">69%</span> maintain good work-life balance</p>
+                </div>
+              </div>
+    
+            </div>
+          </div>
+    
+          <div class="peer-outcomes">
+            <h3>Mental Health Outcomes in Your Peer Group</h3>
+            <div class="outcomes-visualization">
+              <div class="outcome-donut">
+                <div id="peer-depression-chart"></div>
+              </div>
+              <div class="outcome-stats">
+                <div class="outcome-stat positive">
+                  <span class="outcome-number" id="peer-healthy-rate">67%</span>
+                  <span class="outcome-label">Report good mental health</span>
+                </div>
+                <div class="outcome-stat concerning">
+                  <span class="outcome-number" id="peer-depression-rate">33%</span>
+                  <span class="outcome-label">Experience depression symptoms</span>
+                </div>
+                <div class="outcome-insight">
+                  <p id="peer-group-insight">Students with your profile have a <strong>25% lower</strong> depression rate than the general student population.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <div class="comparison-footer">
+          <button id="reveal-my-risk" class="comparison-final-btn">
+            <span class="btn-icon">🎯</span>
+            Reveal My Personal Risk Assessment
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
 
     <!-- Timeline Screen for Business Profile -->
     <div id="timeline-screen" class="page hidden">
@@ -157,73 +574,73 @@
     </div>
 
     <!-- Engineering Matrix Screen -->
-<div id="engineering-matrix-screen" class="page hidden">
-  <button class="back-button">← BACK TO PROFILES</button>
-    <div class="container">
-      <h1>💤 The Sleep Sacrifice Matrix (Engineering Students)</h1>
-      <p>This matrix shows how sleep duration and study hours intersect to impact depression risk among engineering students.</p>
-      <div class="matrix-wrapper">
-        <svg id="engineering-matrix-svg" width="960" height="500"></svg>
-      </div>
-      
-      <div class="legend-box-fixed" style="margin-top: 20px;">
-        <div class="legend-item">
-            <div class="legend-color" style="background:#ff0000; width: 15px; height: 15px; border-radius: 50%; margin-right: 8px;"></div>
-            Higher Depression Rate
+    <div id="engineering-matrix-screen" class="page hidden">
+      <button class="back-button">← BACK TO PROFILES</button>
+        <div class="container">
+          <h1>💤 The Sleep Sacrifice Matrix (Engineering Students)</h1>
+          <p>This matrix shows how sleep duration and study hours intersect to impact depression risk among engineering students.</p>
+          <div class="matrix-wrapper">
+            <svg id="engineering-matrix-svg" width="960" height="500"></svg>
           </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background:#ff6600; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;"></div>
-            Fewer Students
+          
+          <div class="legend-box-fixed" style="margin-top: 20px;">
+            <div class="legend-item">
+                <div class="legend-color" style="background:#ff0000; width: 15px; height: 15px; border-radius: 50%; margin-right: 8px;"></div>
+                Higher Depression Rate
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background:#ff6600; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;"></div>
+                Fewer Students
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background:#ff6600; width: 16px; height: 16px; border-radius: 50%; margin-right: 8px;"></div>
+                More Students
+              </div>          
           </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background:#ff6600; width: 16px; height: 16px; border-radius: 50%; margin-right: 8px;"></div>
-            More Students
-          </div>          
+          <div class="panel-next-button-container">
+            <button id="next-from-engineering" class="next-button">→ View Risk Insights</button>
+          </div>
+        </div>
       </div>
-      <div class="panel-next-button-container">
-        <button id="next-from-engineering" class="next-button">→ View Risk Insights</button>
+      <div class="tooltip" id="engineering-tooltip"></div>
+
+    <!-- Arts Analysis Screen -->
+    <div id="arts-analysis-screen" class="page hidden">
+      <button class="back-button">← BACK TO PROFILES</button>
+      <div class="container">
+        <h1>🎨 Arts Students: Wellbeing Factors Analysis</h1>
+        <p>Explore how dietary habits and study satisfaction impact mental health among arts students.</p>
+        
+        <section class="chart-section">
+          <h2>Dietary Habits & Depression</h2>
+          <div id="dietary-habits-chart"></div>
+        </section>
+        
+        <section class="chart-section">
+          <h2>Study Satisfaction & Depression</h2>
+          <div id="study-satisfaction-chart"></div>
+        </section>
+        
+        <div class="panel-next-button-container">
+          <button id="next-from-arts" class="next-button">→ View Risk Insights</button>
+        </div>
       </div>
     </div>
-  </div>
-  <div class.tooltip" id="engineering-tooltip"></div>
 
-<!-- Arts Analysis Screen -->
-<div id="arts-analysis-screen" class="page hidden">
-  <button class="back-button">← BACK TO PROFILES</button>
-  <div class="container">
-    <h1>🎨 Arts Students: Wellbeing Factors Analysis</h1>
-    <p>Explore how dietary habits and study satisfaction impact mental health among arts students.</p>
-    
-    <section class="chart-section">
-      <h2>Dietary Habits & Depression</h2>
-      <div id="dietary-habits-chart"></div>
-    </section>
-    
-    <section class="chart-section">
-      <h2>Study Satisfaction & Depression</h2>
-      <div id="study-satisfaction-chart"></div>
-    </section>
-    
-    <div class="panel-next-button-container">
-      <button id="next-from-arts" class="next-button">→ View Risk Insights</button>
+    <!-- Medicine Analysis Screen -->
+    <div id="medicine-analysis-screen" class="page hidden">
+      <button class="back-button">← BACK TO PROFILES</button>
+      <div class="container">
+        <h1>🏥 Medicine Students: Mental Health Spiral Analysis</h1>
+        <p>Explore how sleep patterns, academic pressure, and study hours create a complex spiral of mental health outcomes for medicine students.</p>
+        
+        <!-- The medicine spiral content will be dynamically created here by medicine-spiral.js -->
+        
+        <div class="panel-next-button-container">
+          <button id="next-from-medicine" class="next-button">→ View Risk Insights</button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
-<!-- Medicine Analysis Screen -->
-<div id="medicine-analysis-screen" class="page hidden">
-  <button class="back-button">← BACK TO PROFILES</button>
-  <div class="container">
-    <h1>🏥 Medicine Students: Mental Health Spiral Analysis</h1>
-    <p>Explore how sleep patterns, academic pressure, and study hours create a complex spiral of mental health outcomes for medicine students.</p>
-    
-    <!-- The medicine spiral content will be dynamically created here by medicine-spiral.js -->
-    
-    <div class="panel-next-button-container">
-      <button id="next-from-medicine" class="next-button">→ View Risk Insights</button>
-    </div>
-  </div>
-</div>
 
     <!-- Risk Background Panels Page -->
     <div id="risk-panels-screen" class="page hidden">
@@ -289,10 +706,62 @@
         </section>
 
         <div class="panel-next-button-container">
-          <button id="next-to-user" class="next-button">→ Start Your Journey</button>
+          <button id="next-to-user" class="next-button">→ Start Your Personal Assessment</button>
         </div>
       </div>
     </div>
+
+    <!-- Scripts - FIXED VERSION -->
+    <script type="module" src="./user-model.js"></script>
+    <script type="module" src="./script.js"></script>
+    <script type="module" src="post-assessment.js"></script>
+    <script type="module">
+      // Simple, working event listeners
+      function startGame() {
+        console.log('Starting game...');
+        document.getElementById("welcome-screen").classList.add("hidden");
+        document.getElementById("profiles-screen").classList.remove("hidden");
+      }
+
+      function goBack() {
+        console.log('Going back...');
+        document.getElementById("profiles-screen").classList.add("hidden");
+        document.getElementById("welcome-screen").classList.remove("hidden");
+        document.getElementById("visualization-panel").classList.add("hidden");
+        
+        // Hide user assessment screens
+        const userScreens = ['user-profile', 'user-results-screen'];
+        userScreens.forEach(screenId => {
+          const screen = document.getElementById(screenId);
+          if (screen) screen.classList.add('hidden');
+        });
+      }
+
+      // Wait for DOM to be ready
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM loaded, setting up event listeners...');
+        
+        const backBtn = document.getElementById('back-button');
+        const startBtn = document.getElementById('start-button');
+        
+        if (backBtn) {
+          backBtn.addEventListener('click', goBack);
+          console.log('Back button listener added');
+        } else {
+          console.error('Back button not found!');
+        }
+        
+        if (startBtn) {
+          startBtn.addEventListener('click', startGame);
+          console.log('Start button listener added');
+        } else {
+          console.error('Start button not found!');
+        }
+
+        console.log('✅ Basic navigation set up successfully');
+      });
+    </script>
+
+    <div class="tooltip" id="tooltip"></div>
   </body>
-  <div class="tooltip" id="tooltip"></div>
 </html>
