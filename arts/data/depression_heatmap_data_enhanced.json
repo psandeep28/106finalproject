@@ -1,0 +1,130 @@
+[
+  {
+    "Profile":"Arts",
+    "Sleep":"Less than 5 hours",
+    "Rate":0.605,
+    "Count":120,
+    "ProfileAverage":0.53025,
+    "DeltaFromAvg":0.07475
+  },
+  {
+    "Profile":"Business",
+    "Sleep":"Less than 5 hours",
+    "Rate":0.599,
+    "Count":115,
+    "ProfileAverage":0.55925,
+    "DeltaFromAvg":0.03975
+  },
+  {
+    "Profile":"Engineering",
+    "Sleep":"Less than 5 hours",
+    "Rate":0.62,
+    "Count":130,
+    "ProfileAverage":0.54025,
+    "DeltaFromAvg":0.07975
+  },
+  {
+    "Profile":"Medicine",
+    "Sleep":"Less than 5 hours",
+    "Rate":0.619,
+    "Count":110,
+    "ProfileAverage":0.55625,
+    "DeltaFromAvg":0.06275
+  },
+  {
+    "Profile":"Arts",
+    "Sleep":"5-6 hours",
+    "Rate":0.519,
+    "Count":140,
+    "ProfileAverage":0.53025,
+    "DeltaFromAvg":-0.01125
+  },
+  {
+    "Profile":"Business",
+    "Sleep":"5-6 hours",
+    "Rate":0.565,
+    "Count":150,
+    "ProfileAverage":0.55925,
+    "DeltaFromAvg":0.00575
+  },
+  {
+    "Profile":"Engineering",
+    "Sleep":"5-6 hours",
+    "Rate":0.548,
+    "Count":160,
+    "ProfileAverage":0.54025,
+    "DeltaFromAvg":0.00775
+  },
+  {
+    "Profile":"Medicine",
+    "Sleep":"5-6 hours",
+    "Rate":0.561,
+    "Count":135,
+    "ProfileAverage":0.55625,
+    "DeltaFromAvg":0.00475
+  },
+  {
+    "Profile":"Arts",
+    "Sleep":"7-8 hours",
+    "Rate":0.543,
+    "Count":180,
+    "ProfileAverage":0.53025,
+    "DeltaFromAvg":0.01275
+  },
+  {
+    "Profile":"Business",
+    "Sleep":"7-8 hours",
+    "Rate":0.59,
+    "Count":170,
+    "ProfileAverage":0.55925,
+    "DeltaFromAvg":0.03075
+  },
+  {
+    "Profile":"Engineering",
+    "Sleep":"7-8 hours",
+    "Rate":0.559,
+    "Count":190,
+    "ProfileAverage":0.54025,
+    "DeltaFromAvg":0.01875
+  },
+  {
+    "Profile":"Medicine",
+    "Sleep":"7-8 hours",
+    "Rate":0.573,
+    "Count":160,
+    "ProfileAverage":0.55625,
+    "DeltaFromAvg":0.01675
+  },
+  {
+    "Profile":"Arts",
+    "Sleep":"More than 8 hours",
+    "Rate":0.454,
+    "Count":100,
+    "ProfileAverage":0.53025,
+    "DeltaFromAvg":-0.07625
+  },
+  {
+    "Profile":"Business",
+    "Sleep":"More than 8 hours",
+    "Rate":0.483,
+    "Count":105,
+    "ProfileAverage":0.55925,
+    "DeltaFromAvg":-0.07625
+  },
+  {
+    "Profile":"Engineering",
+    "Sleep":"More than 8 hours",
+    "Rate":0.434,
+    "Count":110,
+    "ProfileAverage":0.54025,
+    "DeltaFromAvg":-0.10625
+  },
+  {
+    "Profile":"Medicine",
+    "Sleep":"More than 8 hours",
+    "Rate":0.472,
+    "Count":95,
+    "ProfileAverage":0.55625,
+    "DeltaFromAvg":-0.08425
+  }
+]

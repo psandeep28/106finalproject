@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Medicine Student Wellness Matrix</title>
+
+  <!-- d3 -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <!-- styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h1 style="text-align:center;margin-top:25px;">Medicine Student Wellness Matrix</h1>
+
+  <!-- filter controls -->
+  <div style="text-align:center; margin-bottom:10px;">
+    <label style="color:#8fe7fa;font-size:1.15em;">Degree:
+      <select id="degree-select"></select>
+    </label>
+    &nbsp;&nbsp;
+    <label style="color:#8fe7fa;font-size:1.15em;">
+      <input type="checkbox" id="show-females" checked /> Female
+    </label>
+    <label style="color:#8fe7fa;font-size:1.15em;">
+      <input type="checkbox" id="show-males" checked /> Male
+    </label>
+  </div>
+
+  <!-- matrix -->
+  <div id="matrix-container">
+    <svg id="matrix-plot" width="900" height="540"></svg>
+  </div>
+
+  <!-- tooltip sits in <body>, not inside the container -->
+  <div id="matrix-tooltip"></div>
+
+  <script src="vis-matrix.js"></script>
+</body>
+</html>

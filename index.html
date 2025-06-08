@@ -8,19 +8,11 @@
     <link rel="stylesheet" href="style.css" />
     <script src='https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-    <script type="module" src="./user-ineract.js"></script>
-    <script type="module" src="./script.js"></script>
+    <script src="medicine-spiral.js"></script>
+    <script src="coping-strategies.js"></script>
+
   </head>
   <body>
-    <script type="module">
-      import { startGame, goBack } from './script.js';
-      let backbtn = document.getElementsByClassName('back-button')[0];
-      let strtbtn = document.getElementsByClassName('start-button')[0];
-      console.log(strtbtn);
-      backbtn.addEventListener('click', goBack);
-      strtbtn.addEventListener('click', startGame);
-    </script>
-
     <!-- Welcome Screen -->
     <div id="welcome-screen" class="page">
       <div class="background"></div>
@@ -33,14 +25,14 @@
           <p>Explore how different factors like <span class="highlight">sleep patterns</span>, <span class="highlight">academic pressure</span>, and <span class="highlight">financial stress</span> influence depression risk across career fields.</p>
           <p>Navigate through data-driven visualizations to discover insights that can help guide students toward healthier paths.</p>
         </div>
-        <button class="start-button">► START EXPLORATION</button>
+        <button class="start-button" id="start-button">► START EXPLORATION</button>
       </div>
-      <div class="credits">Data Visualization Project | DSC 106 Final</div>
+      <div class="credits"> Parth Sandeep, Emma Shamir, Meera Sharma, Martin Hawks </div>
     </div>
 
     <!-- Profiles Page -->
     <div id="profiles-screen" class="page hidden">
-      <button class="back-button">← BACK</button>
+      <button class="back-button" id="back-button">← BACK</button>
       <div class="container">
         <div class="header">
           <h1 class="page-title">CAREER PROFILE ANALYSIS</h1>
@@ -85,52 +77,475 @@
       </div>
     </div>
 
-    <!-- User Profile Input P -->
-    <div id="user-profile" class="hidden">
-      <h2>How are you feeling?</h2>
-      <p class="instruction">Rate where you fall below to get a prediction of your major, and where your risk falls relative to the other majors</p>
-      <div id="user-chart"></div>
-      <div id="user-input">
-        <!-- TODO: Rearange the order of this to be more intuitive for
-        a user looking at the chart -->
-        <div class="userin slider">
-          <p>Work/Study Hours</p>
-          <input id="hrs" class="user-input" name="Work/Study Hours" type="range" value="0" min="0" max="24"/>
-          <label id='hrs-label' class="value" for=""></label>
+    <!-- Enhanced User Profile Input Page -->
+    <div id="user-profile" class="page hidden">
+      <div class="assessment-container">
+        <div class="assessment-header">
+          <div class="step-indicator">
+            <div class="step current">1</div>
+            <div class="step-line"></div>
+            <div class="step">2</div>
+            <div class="step-line"></div>
+            <div class="step">3</div>
+            <div class="step-line"></div>
+            <div class="step">4</div>
+          </div>
+          <h2 class="assessment-title">
+            <span class="title-icon">🎯</span>
+            Personal Risk Assessment
+          </h2>
+          <p class="assessment-subtitle">
+            Help us understand your situation to provide personalized insights
+          </p>
         </div>
-        <div class="userin slider">
-          <p>Academic Pressure:</p>
-          <input class='user-input slider-input' id="ac-pressure" name="Academic Pressure" type="range" min=0 max=100 value="0"/>
-          <label class="value" for=""></label>
+
+        <div class="assessment-content">
+          <div class="assessment-left">
+            <div class="radar-container">
+              <div id="user-chart" class="chart-container"></div>
+              <div class="chart-legend">
+                <div class="legend-item">
+                  <span class="legend-dot academic"></span>
+                  Academic Pressure
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot financial"></span>
+                  Financial Stress
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot balance"></span>
+                  Work-Life Balance
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot support"></span>
+                  Social Support
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot security"></span>
+                  Job Security
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="assessment-right">
+            <div class="assessment-form">
+              <div class="form-section">
+                <h3>Stress Factors</h3>
+
+                <div class="input-group">
+                  <label for="ac-pressure">Academic Pressure</label>
+                  <div class="slider-container">
+                    <input type="range" id="ac-pressure" name="Academic Pressure"
+                           class="assessment-slider" min="0" max="100" value="50">
+                    <div class="slider-labels">
+                      <span>Low</span>
+                      <span class="slider-value" id="ac-pressure-value">50</span>
+                      <span>High</span>
+                    </div>
+                  </div>
+                  <div class="input-hint">How overwhelmed do you feel by academic demands?</div>
+                </div>
+
+                <div class="input-group">
+                  <label for="fin-stress">Financial Stress</label>
+                  <div class="slider-container">
+                    <input type="range" id="fin-stress" name="Financial Stress"
+                           class="assessment-slider" min="0" max="100" value="50">
+                    <div class="slider-labels">
+                      <span>Secure</span>
+                      <span class="slider-value" id="fin-stress-value">50</span>
+                      <span>Stressed</span>
+                    </div>
+                  </div>
+                  <div class="input-hint">How worried are you about money and expenses?</div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3>Support Systems</h3>
+
+                <div class="input-group">
+                  <label for="wl-balance">Work-Life Balance</label>
+                  <div class="slider-container">
+                    <input type="range" id="wl-balance" name="Work-Life Balance"
+                           class="assessment-slider" min="0" max="100" value="50">
+                    <div class="slider-labels">
+                      <span>Poor</span>
+                      <span class="slider-value" id="wl-balance-value">50</span>
+                      <span>Excellent</span>
+                    </div>
+                  </div>
+                  <div class="input-hint">How well do you balance work/study with personal time?</div>
+                </div>
+
+                <div class="input-group">
+                  <label for="soc-supp">Social Support</label>
+                  <div class="slider-container">
+                    <input type="range" id="soc-supp" name="Social Support"
+                           class="assessment-slider" min="0" max="100" value="50">
+                    <div class="slider-labels">
+                      <span>Isolated</span>
+                      <span class="slider-value" id="soc-supp-value">50</span>
+                      <span>Supported</span>
+                    </div>
+                  </div>
+                  <div class="input-hint">How connected do you feel to friends, family, and community?</div>
+                </div>
+
+                <div class="input-group">
+                  <label for="job-sec">Job Security</label>
+                  <div class="slider-container">
+                    <input type="range" id="job-sec" name="Job Security"
+                           class="assessment-slider" min="0" max="100" value="50">
+                    <div class="slider-labels">
+                      <span>Uncertain</span>
+                      <span class="slider-value" id="job-sec-value">50</span>
+                      <span>Confident</span>
+                    </div>
+                  </div>
+                  <div class="input-hint">How confident are you about your career prospects?</div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3>Sleep Patterns</h3>
+
+                <div class="input-group">
+                  <label for="sleep-amnt">Average Sleep per Night</label>
+                  <select id="sleep-amnt" name="Amount of Sleep" class="assessment-select">
+                    <option value="5">Less than 5 Hours</option>
+                    <option value="5-6">5–6 Hours</option>
+                    <option value="7-8" selected>7–8 Hours</option>
+                    <option value="8">More than 8 Hours</option>
+                  </select>
+                  <div class="input-hint">Quality sleep is crucial for mental health</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="userin slider">
-          <p>Financial Stress:</p>
-          <input class='user-input slider-input' id="fin-stress" name="Financial Stress" type="range" min=0 max=100 value="0"/>
-          <label class="value" for=""></label>
+
+        <div class="assessment-footer">
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" id="assessment-progress"></div>
+            </div>
+            <div class="progress-text" id="progress-text">Adjust the sliders to see your profile</div>
+          </div>
+
+          <button id="complete-assessment-btn" class="assessment-button" disabled>
+            <span class="button-icon">🎯</span>
+            <span class="button-text">Analyze My Risk Profile</span>
+            <span class="button-arrow">→</span>
+          </button>
+
+          <div class="privacy-note">
+            <span class="privacy-icon">🔒</span>
+            Your responses are confidential and used only for this assessment
+          </div>
         </div>
-        <div class="userin slider">
-          <p>Work-Life Balance:</p>
-          <input class='user-input slider-input' id="wl-balance" name="Work-Life Balance" type="range" min=0 max=100 value="0"/>
-          <label class="value" for=""></label>
+      </div>
+    </div>
+
+    <div id="your-sleep-comparison" class="page hidden">
+      <div class="container">
+        <div class="comparison-header">
+          <h1 class="page-title">😴 Your Sleep Pattern vs 27,901 Students</h1>
+          <p class="comparison-subtitle">Let's see how your <span class="user-highlight" id="user-sleep-display">7-8 hours</span> of sleep compares</p>
         </div>
-        <div class="userin slider">
-          <p>Social Support:</p>
-          <input class='user-input slider-input' id="soc-supp" name="Social Support" type="range" min=0 max=100 value="0"/>
-          <label class="value" for=""></label>
+
+        <div class="sleep-comparison-content">
+          <div class="user-spotlight">
+            <div class="you-card">
+              <div class="you-icon">👤</div>
+              <h3>YOU</h3>
+              <div class="you-sleep" id="you-sleep-hours">7-8 hours</div>
+              <div class="you-position">Optimal Range</div>
+            </div>
+          </div>
+
+          <div class="population-visualization">
+            <h3>Where You Stand in the Population</h3>
+            <div id="sleep-population-chart" class="population-chart">
+              <!-- Dynamic chart will be inserted here -->
+            </div>
+
+            <div class="sleep-insights-grid">
+              <div class="insight-card positive" id="sleep-insight-card">
+                <div class="insight-icon">💡</div>
+                <div class="insight-content">
+                  <h4>Your Sleep Advantage</h4>
+                  <p id="sleep-advantage-text">You're in the 33% of students who get optimal sleep!</p>
+                </div>
+              </div>
+
+              <div class="stats-comparison">
+                <div class="stat-item">
+                  <span class="stat-number" id="your-group-size">9,184</span>
+                  <span class="stat-label">students sleep like you</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number" id="your-group-depression">42.1%</span>
+                  <span class="stat-label">depression rate in your sleep group</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number depression-diff" id="depression-difference">-16.5%</span>
+                  <span class="stat-label">vs. average depression rate</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="userin slider">
-          <p>Job Securiry:</p>
-          <input class='user-input slider-input' id="job-sec" name="Job Security" type="range" min=0 max=100 value="0"/>
-          <label class="value" for=""></label>
+
+        <div class="comparison-footer">
+          <button id="next-to-stress-comparison" class="comparison-next-btn">
+            <span class="btn-icon">⚡</span>
+            See Your Stress Profile
+            <span class="btn-arrow">→</span>
+          </button>
         </div>
-        <div class="userin">
-          <p>Amount of Sleep per night</p>
-          <select class='user-input drop-input' id="sleep-amnt" name="Amount of Sleep">
-            <option value="1">Less than 5 Hours</option>
-            <option value="2">5–6 Hours</option>
-            <option value="3">7–8 Hours</option>
-            <option value="4">More than 8 Hours</option>
-          </select>
+      </div>
+    </div>
+
+    <!-- Screen 2: Your Stress Profile vs Dataset -->
+    <div id="your-stress-comparison" class="page hidden">
+      <div class="container">
+        <div class="comparison-header">
+          <h1 class="page-title">⚡ Your Stress Profile Breakdown</h1>
+          <p class="comparison-subtitle">How your stress levels compare to thousands of other students</p>
+        </div>
+
+        <div class="stress-profile-content">
+          <div class="stress-radar-section">
+            <h3>Your Stress Signature</h3>
+            <div class="radar-comparison">
+              <div id="user-stress-radar" class="stress-radar"></div>
+              <div class="radar-legend">
+                <div class="legend-item">
+                  <span class="legend-dot you-color"></span>
+                  Your Profile
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot average-color"></span>
+                  Average Student
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="factor-analysis">
+            <h3>Factor-by-Factor Breakdown</h3>
+            <div class="factor-comparisons">
+
+              <div class="factor-comparison">
+                <div class="factor-header">
+                  <span class="factor-icon">📚</span>
+                  <span class="factor-name">Academic Pressure</span>
+                </div>
+                <div class="comparison-bars">
+                  <div class="bar-container">
+                    <div class="bar-label">You</div>
+                    <div class="comparison-bar you-bar">
+                      <div class="bar-fill you-fill" id="you-academic-bar" style="width: 70%"></div>
+                      <span class="bar-value" id="you-academic-value">70</span>
+                    </div>
+                  </div>
+                  <div class="bar-container">
+                    <div class="bar-label">Average</div>
+                    <div class="comparison-bar avg-bar">
+                      <div class="bar-fill avg-fill" style="width: 65.2%"></div>
+                      <span class="bar-value">65.2</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="factor-insight" id="academic-insight">
+                  You're slightly above average in academic pressure
+                </div>
+              </div>
+
+              <div class="factor-comparison">
+                <div class="factor-header">
+                  <span class="factor-icon">💰</span>
+                  <span class="factor-name">Financial Stress</span>
+                </div>
+                <div class="comparison-bars">
+                  <div class="bar-container">
+                    <div class="bar-label">You</div>
+                    <div class="comparison-bar you-bar">
+                      <div class="bar-fill you-fill" id="you-financial-bar" style="width: 45%"></div>
+                      <span class="bar-value" id="you-financial-value">45</span>
+                    </div>
+                  </div>
+                  <div class="bar-container">
+                    <div class="bar-label">Average</div>
+                    <div class="comparison-bar avg-bar">
+                      <div class="bar-fill avg-fill" style="width: 52.8%"></div>
+                      <span class="bar-value">52.8</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="factor-insight" id="financial-insight">
+                  You have lower financial stress than most students
+                </div>
+              </div>
+
+              <div class="factor-comparison">
+                <div class="factor-header">
+                  <span class="factor-icon">⚖️</span>
+                  <span class="factor-name">Work-Life Balance</span>
+                </div>
+                <div class="comparison-bars">
+                  <div class="bar-container">
+                    <div class="bar-label">You</div>
+                    <div class="comparison-bar you-bar">
+                      <div class="bar-fill you-fill protective" id="you-balance-bar" style="width: 75%"></div>
+                      <span class="bar-value" id="you-balance-value">75</span>
+                    </div>
+                  </div>
+                  <div class="bar-container">
+                    <div class="bar-label">Average</div>
+                    <div class="comparison-bar avg-bar">
+                      <div class="bar-fill avg-fill" style="width: 48.3%"></div>
+                      <span class="bar-value">48.3</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="factor-insight" id="balance-insight">
+                  Your work-life balance is significantly better than average
+                </div>
+              </div>
+
+              <div class="factor-comparison">
+                <div class="factor-header">
+                  <span class="factor-icon">🤝</span>
+                  <span class="factor-name">Social Support</span>
+                </div>
+                <div class="comparison-bars">
+                  <div class="bar-container">
+                    <div class="bar-label">You</div>
+                    <div class="comparison-bar you-bar">
+                      <div class="bar-fill you-fill protective" id="you-social-bar" style="width: 80%"></div>
+                      <span class="bar-value" id="you-social-value">80</span>
+                    </div>
+                  </div>
+                  <div class="bar-container">
+                    <div class="bar-label">Average</div>
+                    <div class="comparison-bar avg-bar">
+                      <div class="bar-fill avg-fill" style="width: 61.7%"></div>
+                      <span class="bar-value">61.7</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="factor-insight" id="social-insight">
+                  You feel more supported than most students
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="comparison-footer">
+          <button id="next-to-peer-match" class="comparison-next-btn">
+            <span class="btn-icon">👥</span>
+            Find Your Student Matches
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen 3: Find Students Most Like You -->
+    <div id="peer-matching-screen" class="page hidden">
+      <div class="container">
+        <div class="comparison-header">
+          <h1 class="page-title">👥 Students Most Like You</h1>
+          <p class="comparison-subtitle">Based on your responses, here are your closest matches in the dataset</p>
+        </div>
+
+        <div class="peer-matching-content">
+          <div class="similarity-score">
+            <div class="score-circle">
+              <div class="score-number" id="similarity-score">847</div>
+              <div class="score-label">similar students found</div>
+            </div>
+            <div class="match-quality">
+              <div class="match-bar">
+                <div class="match-fill" id="match-quality-bar" style="width: 92%"></div>
+              </div>
+              <span class="match-percentage">92% similarity match</span>
+            </div>
+          </div>
+
+          <div class="peer-characteristics">
+            <h3>Your Peer Group Characteristics</h3>
+            <div class="characteristic-grid">
+
+              <div class="characteristic-card">
+                <div class="char-icon">😴</div>
+                <div class="char-content">
+                  <h4>Sleep Pattern</h4>
+                  <p><span class="highlight-stat">78%</span> sleep 7-8 hours like you</p>
+                </div>
+              </div>
+
+              <div class="characteristic-card">
+                <div class="char-icon">📚</div>
+                <div class="char-content">
+                  <h4>Academic Load</h4>
+                  <p><span class="highlight-stat">65%</span> report similar academic pressure</p>
+                </div>
+              </div>
+
+              <div class="characteristic-card">
+                <div class="char-icon">🤝</div>
+                <div class="char-content">
+                  <h4>Support Systems</h4>
+                  <p><span class="highlight-stat">71%</span> have strong social support</p>
+                </div>
+              </div>
+
+              <div class="characteristic-card">
+                <div class="char-icon">⚖️</div>
+                <div class="char-content">
+                  <h4>Life Balance</h4>
+                  <p><span class="highlight-stat">69%</span> maintain good work-life balance</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="peer-outcomes">
+            <h3>Mental Health Outcomes in Your Peer Group</h3>
+            <div class="outcomes-visualization">
+              <div class="outcome-donut">
+                <div id="peer-depression-chart"></div>
+              </div>
+              <div class="outcome-stats">
+                <div class="outcome-stat positive">
+                  <span class="outcome-number" id="peer-healthy-rate">67%</span>
+                  <span class="outcome-label">Report good mental health</span>
+                </div>
+                <div class="outcome-stat concerning">
+                  <span class="outcome-number" id="peer-depression-rate">33%</span>
+                  <span class="outcome-label">Experience depression symptoms</span>
+                </div>
+                <div class="outcome-insight">
+                  <p id="peer-group-insight">Students with your profile have a <strong>25% lower</strong> depression rate than the general student population.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comparison-footer">
+          <button id="reveal-my-risk" class="comparison-final-btn">
+            <span class="btn-icon">🎯</span>
+            Reveal My Personal Risk Assessment
+            <span class="btn-arrow">→</span>
+          </button>
         </div>
         <div class="activate">
           <input id="run-model" name="Predict" type="button" value="Make Prediction"/>
@@ -146,6 +561,7 @@
 
     <!-- Timeline Screen for Business Profile -->
     <div id="timeline-screen" class="page hidden">
+      <button class="back-button">← BACK TO PROFILES</button>
       <div class="container">
         <h1>📈 Business Students: Stress & Depression Over Time</h1>
         <p>This visualization explores how stress evolves with age for business students. It compares academic and financial stress scores,
@@ -168,56 +584,250 @@
     </div>
 
     <!-- Engineering Matrix Screen -->
-<div id="engineering-matrix-screen" class="page hidden">
-    <div class="container">
-      <h1>💤 The Sleep Sacrifice Matrix (Engineering Students)</h1>
-      <p>This matrix shows how sleep duration and study hours intersect to impact depression risk among engineering students.</p>
-      <div class="matrix-wrapper">
-        <svg id="engineering-matrix-svg" width="960" height="500"></svg>
-      </div>
-      
-      <div class="legend-box-fixed" style="margin-top: 20px;">
-        <div class="legend-item">
-            <div class="legend-color" style="background:#ff0000; width: 15px; height: 15px; border-radius: 50%; margin-right: 8px;"></div>
-            Higher Depression Rate
+    <div id="engineering-matrix-screen" class="page hidden">
+      <button class="back-button">← BACK TO PROFILES</button>
+        <div class="container">
+          <h1>💤 The Sleep Sacrifice Matrix (Engineering Students)</h1>
+          <p>This matrix shows how sleep duration and study hours intersect to impact depression risk among engineering students.</p>
+          <div class="matrix-wrapper">
+            <svg id="engineering-matrix-svg" width="960" height="500"></svg>
           </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background:#ff6600; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;"></div>
-            Fewer Students
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background:#ff6600; width: 16px; height: 16px; border-radius: 50%; margin-right: 8px;"></div>
-            More Students
-          </div>          
-      </div>
-      <div class="panel-next-button-container">
-        <button id="next-from-engineering" class="next-button">→ View Risk Insights</button>
-      </div>
-    </div>
-  </div>
-  <div class.tooltip" id="engineering-tooltip"></div>
 
-<!-- Arts Analysis Screen -->
-<div id="arts-analysis-screen" class="page hidden">
-  <div class="container">
-    <h1>🎨 Arts Students: Wellbeing Factors Analysis</h1>
-    <p>Explore how dietary habits and study satisfaction impact mental health among arts students.</p>
-    
-    <section class="chart-section">
-      <h2>Dietary Habits & Depression</h2>
-      <div id="dietary-habits-chart"></div>
-    </section>
-    
-    <section class="chart-section">
-      <h2>Study Satisfaction & Depression</h2>
-      <div id="study-satisfaction-chart"></div>
-    </section>
-    
-    <div class="panel-next-button-container">
-      <button id="next-from-arts" class="next-button">→ View Risk Insights</button>
+          <div class="legend-box-fixed" style="margin-top: 20px;">
+            <div class="legend-item">
+                <div class="legend-color" style="background:#ff0000; width: 15px; height: 15px; border-radius: 50%; margin-right: 8px;"></div>
+                Higher Depression Rate
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background:#ff6600; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;"></div>
+                Fewer Students
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background:#ff6600; width: 16px; height: 16px; border-radius: 50%; margin-right: 8px;"></div>
+                More Students
+              </div>
+          </div>
+          <div class="panel-next-button-container">
+            <button id="next-from-engineering" class="next-button">→ View Risk Insights</button>
+          </div>
+        </div>
+      </div>
+      <div class="tooltip" id="engineering-tooltip"></div>
+
+    <!-- Arts Analysis Screen -->
+    <div id="arts-analysis-screen" class="page hidden">
+      <button class="back-button">← BACK TO PROFILES</button>
+
+      <div class="arts-radial-section">
+        <div class="arts-radial-header">
+          <h2 class="radial-title">🎨 Sleep & Pressure Heat Ring Analysis</h2>
+          <p class="radial-description">
+            This circular visualization reveals how sleep patterns and academic pressure intersect to create different mental health outcomes for arts students.
+            Each ring represents a sleep duration category (inner = less sleep), while segments show academic pressure levels (1-5).
+            <strong style="color: #ff6f96;">Darker red areas indicate higher depression rates</strong> in that combination.
+          </p>
+        </div>
+
+        <!-- Enhanced Controls -->
+        <div class="arts-controls">
+          <div class="control-group-arts">
+            <h3>🎛️ Filter Options</h3>
+            <div class="checkbox-controls">
+              <label class="arts-checkbox-label">
+                <input type="checkbox" id="arts-fem" checked class="arts-checkbox" />
+                <span class="arts-checkbox-custom"></span>
+                <span class="gender-icon">♀</span>
+                Female Students
+              </label>
+              <label class="arts-checkbox-label">
+                <input type="checkbox" id="arts-male" checked class="arts-checkbox" />
+                <span class="arts-checkbox-custom"></span>
+                <span class="gender-icon">♂</span>
+                Male Students
+              </label>
+              <label class="arts-checkbox-label">
+                <input type="checkbox" id="arts-small" class="arts-checkbox" />
+                <span class="arts-checkbox-custom"></span>
+                <span class="cohort-icon">👥</span>
+                Include Small Groups (< 4 students)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visualization Container -->
+        <div class="arts-radial-container">
+          <svg id="arts-radial" width="700" height="700"></svg>
+
+          <!-- Enhanced Legends -->
+          <div class="arts-legends">
+            <div class="legend-section-arts">
+              <h4>⚡ Academic Pressure Scale</h4>
+              <div class="pressure-clock-legend">
+                <div class="clock-visual">
+                  <div class="clock-center"></div>
+                  <div class="clock-markers">
+                    <span class="pressure-marker p1">1</span>
+                    <span class="pressure-marker p2">2</span>
+                    <span class="pressure-marker p3">3</span>
+                    <span class="pressure-marker p4">4</span>
+                    <span class="pressure-marker p5">5</span>
+                  </div>
+                </div>
+                <p>Segments represent pressure levels 1-5</p>
+              </div>
+            </div>
+
+            <div class="legend-section-arts">
+              <h4>🌡️ Depression Risk Heat Scale</h4>
+              <div class="heat-scale-legend">
+                <div class="heat-bar"></div>
+                <div class="heat-labels">
+                  <span>0% Low Risk</span>
+                  <span>50% Moderate</span>
+                  <span>100% High Risk</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Dashboard -->
+        <div class="arts-stats-dashboard">
+          <div class="stat-card-arts">
+            <div class="stat-number" id="arts-total-students">0</div>
+            <div class="stat-label">Arts Students Analyzed</div>
+          </div>
+          <div class="stat-card-arts">
+            <div class="stat-number" id="arts-avg-depression">0%</div>
+            <div class="stat-label">Average Depression Rate</div>
+          </div>
+          <div class="stat-card-arts">
+            <div class="stat-number" id="arts-high-risk">0</div>
+            <div class="stat-label">High-Risk Combinations</div>
+          </div>
+          <div class="stat-card-arts">
+            <div class="stat-number" id="arts-optimal-sleep">0%</div>
+            <div class="stat-label">Getting Optimal Sleep (7-8h)</div>
+          </div>
+        </div>
+
+        <div class="panel-next-button-container">
+          <button id="next-from-arts" class="next-button">→ View Risk Insights</button>
+        </div>
+      </div>
+
+      <!-- Interactive Tooltip -->
+      <div id="arts-radial-tooltip" class="arts-tooltip"></div>
     </div>
-  </div>
-</div>
+
+    <!-- Medicine Analysis Screen -->
+    <div id="medicine-analysis-screen" class="page hidden">
+      <button class="back-button">← BACK TO PROFILES</button>
+      <div class="container">
+        <h1>🏥 Medicine Students: Mental Health Spiral Analysis</h1>
+        <p>Explore how sleep patterns, academic pressure, and study hours create a complex spiral of mental health outcomes for medicine students.</p>
+
+        <!-- The medicine spiral content will be dynamically created here by medicine-spiral.js -->
+
+        <div class="medicine-matrix-section">
+          <h2 class="matrix-title">🔬 Academic Pressure vs Sleep Wellness Matrix</h2>
+          <p class="matrix-description">
+            This interactive matrix reveals how academic pressure and sleep duration create different wellness outcomes for medicine students.
+            Each dot represents a group of students - size shows study satisfaction, color shows depression rate.
+          </p>
+
+          <!-- Enhanced Controls -->
+          <div class="matrix-controls">
+            <div class="control-group">
+              <label class="control-label">
+                <span class="control-icon">🎓</span>
+                Degree Focus:
+                <select id="medicine-degree-select" class="matrix-select">
+                  <option value="All">All Medicine Students</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="control-group">
+              <span class="control-label">
+                <span class="control-icon">👥</span>
+                Gender Analysis:
+              </span>
+              <label class="checkbox-label">
+                <input type="checkbox" id="medicine-show-females" checked class="matrix-checkbox" />
+                <span class="checkbox-custom"></span>
+                Female Students
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="medicine-show-males" checked class="matrix-checkbox" />
+                <span class="checkbox-custom"></span>
+                Male Students
+              </label>
+            </div>
+          </div>
+
+          <!-- Matrix Visualization Container -->
+          <div class="medicine-matrix-container">
+            <svg id="medicine-matrix-plot" width="900" height="540"></svg>
+
+            <!-- Enhanced Legend -->
+            <div class="matrix-legend">
+              <div class="legend-section">
+                <h4>Depression Risk Scale</h4>
+                <div class="color-legend">
+                  <div class="color-bar"></div>
+                  <div class="color-labels">
+                    <span>0% Low Risk</span>
+                    <span>50% Moderate</span>
+                    <span>100% High Risk</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="legend-section">
+                <h4>Study Satisfaction</h4>
+                <div class="size-legend">
+                  <div class="size-examples">
+                    <div class="size-dot small"></div>
+                    <span>Low Satisfaction</span>
+                    <div class="size-dot medium"></div>
+                    <span>Average</span>
+                    <div class="size-dot large"></div>
+                    <span>High Satisfaction</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="legend-section">
+                <h4>Key Insights</h4>
+                <div class="insight-bullets">
+                  <div class="insight-item">
+                    <span class="insight-dot danger"></span>
+                    <span>Danger Zone: High pressure + Low sleep</span>
+                  </div>
+                  <div class="insight-item">
+                    <span class="insight-dot optimal"></span>
+                    <span>Sweet Spot: Moderate pressure + 7-8 hours sleep</span>
+                  </div>
+                  <div class="insight-item">
+                    <span class="insight-dot protective"></span>
+                    <span>Protective: Adequate sleep buffers high pressure</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Tooltip -->
+          <div id="medicine-matrix-tooltip" class="matrix-tooltip"></div>
+        </div>
+
+        <div class="panel-next-button-container">
+          <button id="next-from-medicine" class="next-button">→ View Risk Insights</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Risk Background Panels Page -->
     <div id="risk-panels-screen" class="page hidden">
@@ -227,7 +837,7 @@
         <section id="risk-panel-1" class="info-panel">
           <h2>Sleep Duration & Depression Risk</h2>
           <p>
-            Depression is more than just your major. Across all majors as you can see the common theme is sleep. Students who reported experiencing depression were 6% above the average when getting less than 5 hours of sleep. 
+            Depression is more than just your major. Across all majors as you can see the common theme is sleep. Students who reported experiencing depression were 6% above the average when getting less than 5 hours of sleep.
           </p>
           <div id="sleep-risk-chart"></div>
         </section>
@@ -235,15 +845,15 @@
         <section id="risk-panel-2" class="info-panel">
           <h2>We're All In This Together</h2>
           <p>
-            While students with depression spend <strong>1.5 hours more</strong> per day working or studying (7.81 vs 6.24 hours/day), 
+            While students with depression spend <strong>1.5 hours more</strong> per day working or studying (7.81 vs 6.24 hours/day),
             what's most important to understand is that <strong>no academic field is immune to mental health challenges</strong>.
           </p>
           <p>
-            Whether you're in Business, Engineering, Arts, or Medicine, the pressures are real and the struggles are shared. 
+            Whether you're in Business, Engineering, Arts, or Medicine, the pressures are real and the struggles are shared.
             <strong>Depression doesn't discriminate by major</strong> – it affects brilliant minds across all disciplines.
           </p>
           <p>
-            The visualization below shows how students from different fields ultimately face similar challenges. 
+            The visualization below shows how students from different fields ultimately face similar challenges.
             Remember: <strong>seeking help is a sign of strength</strong>, not weakness. You're not alone in this journey.
           </p>
 
@@ -287,6 +897,587 @@
         </div>
       </div>
     </div>
+
+<!-- Add this screen to your HTML, after the peer-matching-screen -->
+
+<!-- Personalized Coping Strategies Screen -->
+<div id="coping-strategies-screen" class="page hidden">
+  <div class="coping-container">
+    <!-- Header with Emergency Resources -->
+    <div class="coping-header">
+      <div class="emergency-banner">
+        <div class="emergency-icon">🚨</div>
+        <div class="emergency-content">
+          <h3>Emergency Resources</h3>
+          <p><strong>If this is an emergency:</strong> Call 911 (Emergency Services) or 988 (Suicide & Crisis Lifeline)</p>
+          <div class="emergency-buttons">
+            <a href="tel:911" class="emergency-btn critical">🚨 Call 911</a>
+            <a href="tel:988" class="emergency-btn crisis">💬 Call 988</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="disclaimer">
+        <p><strong>Important:</strong> These strategies are educational resources, not medical advice. Please consult your primary care or mental health provider for professional guidance.</p>
+      </div>
+
+      <h1 class="coping-title">
+        <span class="title-icon">🛠️</span>
+        Your Personalized Coping Strategies
+      </h1>
+      <p class="coping-subtitle">
+        Based on your assessment, here are evidence-based strategies tailored to your needs
+      </p>
+      <div id="user-risk-summary" class="user-risk-summary">
+        <!-- Dynamic risk summary will be inserted here -->
+      </div>
+    </div>
+
+    <!-- Personalized Strategies Grid -->
+    <div class="strategies-grid">
+
+      <!-- Strategy 1: Social Support -->
+      <div class="strategy-card" id="social-support-card">
+        <div class="strategy-header">
+          <div class="strategy-icon">🤝</div>
+          <div class="strategy-title">
+            <h3>Stay Connected with Your Support Network</h3>
+            <div class="priority-badge" id="social-priority">Medium Priority</div>
+          </div>
+        </div>
+
+        <div class="strategy-content">
+          <div class="why-section">
+            <h4>Why This Matters for You:</h4>
+            <p id="social-personalized">Positive social interactions have been shown to lessen symptoms of depression.</p>
+          </div>
+
+          <div class="strategy-description">
+            <p>Though depression may cause you to feel like you need to isolate yourself–please don't. Even small social interactions can make a meaningful difference.</p>
+          </div>
+
+          <div class="action-steps">
+            <h4>Your Action Plan:</h4>
+            <div class="step-list">
+              <div class="action-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <strong>Reach out to one person today</strong>
+                  <p>Send a text, make a call, or schedule coffee with someone you trust</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <strong>Join a group activity</strong>
+                  <p>Study group, club, intramural sport, or community event</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <strong>Schedule regular check-ins</strong>
+                  <p>Weekly calls with family or friends, even just 10 minutes</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tracking-section">
+            <h4>Track Your Progress:</h4>
+            <div class="progress-tracker">
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="social">
+                <span class="checkmark"></span>
+                I reached out to someone this week
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="social">
+                <span class="checkmark"></span>
+                I participated in a social activity
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy 2: Exercise -->
+      <div class="strategy-card" id="exercise-card">
+        <div class="strategy-header">
+          <div class="strategy-icon">🏃‍♂️</div>
+          <div class="strategy-title">
+            <h3>Implement Regular Exercise</h3>
+            <div class="priority-badge high">High Priority</div>
+          </div>
+        </div>
+
+        <div class="strategy-content">
+          <div class="why-section">
+            <h4>Why This Matters:</h4>
+            <p>Even 20 minutes of exercise can improve symptoms of depression due to the natural release of endorphins during exercise.</p>
+          </div>
+
+          <div class="action-steps">
+            <h4>Start Small, Build Up:</h4>
+            <div class="step-list">
+              <div class="action-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <strong>Begin with a 20-minute walk</strong>
+                  <p>Perfect for beginners - walk around campus, neighborhood, or local park</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <strong>Try campus fitness resources</strong>
+                  <p>Gym, fitness classes, swimming pool, or recreation center</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <strong>Find activities you enjoy</strong>
+                  <p>Dancing, hiking, sports, yoga, or even active video games</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tracking-section">
+            <div class="progress-tracker">
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="exercise">
+                <span class="checkmark"></span>
+                I exercised for 20+ minutes this week
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="exercise">
+                <span class="checkmark"></span>
+                I found a physical activity I enjoy
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy 3: Self Care -->
+      <div class="strategy-card" id="selfcare-card">
+        <div class="strategy-header">
+          <div class="strategy-icon">🛁</div>
+          <div class="strategy-title">
+            <h3>Maintain Self Care</h3>
+            <div class="priority-badge" id="selfcare-priority">Medium Priority</div>
+          </div>
+        </div>
+
+        <div class="strategy-content">
+          <div class="why-section">
+            <h4>Why This Matters for You:</h4>
+            <p id="selfcare-personalized">Severe depression can make it harder to keep up regular hygiene as a routine.</p>
+          </div>
+
+          <div class="strategy-description">
+            <p>If a whole routine seems too daunting, try prioritizing one act per day. Even something as simple as brushing your teeth is a step towards self care.</p>
+          </div>
+
+          <div class="action-steps">
+            <h4>Daily Self-Care Checklist:</h4>
+            <div class="step-list">
+              <div class="action-step">
+                <div class="step-number">✓</div>
+                <div class="step-content">
+                  <strong>Basic hygiene</strong>
+                  <p>Brush teeth, wash face, shower when possible</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">✓</div>
+                <div class="step-content">
+                  <strong>Comfortable clothing</strong>
+                  <p>Wear clean clothes that make you feel good</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">✓</div>
+                <div class="step-content">
+                  <strong>Small comforts</strong>
+                  <p>Make your bed, tidy your space, or enjoy a warm drink</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tracking-section">
+            <div class="progress-tracker">
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="selfcare">
+                <span class="checkmark"></span>
+                I completed my basic hygiene routine
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="selfcare">
+                <span class="checkmark"></span>
+                I did something nice for myself
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy 4: Nutrition -->
+      <div class="strategy-card" id="nutrition-card">
+        <div class="strategy-header">
+          <div class="strategy-icon">🥗</div>
+          <div class="strategy-title">
+            <h3>Focus on Nutritious Eating</h3>
+            <div class="priority-badge" id="nutrition-priority">Medium Priority</div>
+          </div>
+        </div>
+
+        <div class="strategy-content">
+          <div class="why-section">
+            <h4>Why This Matters:</h4>
+            <p>Depression can cause changes in appetite. Regardless of whether you experience an increase or decrease in appetite, focus on consuming whole foods.</p>
+          </div>
+
+          <div class="action-steps">
+            <h4>Nutrition Guidelines:</h4>
+            <div class="step-list">
+              <div class="action-step">
+                <div class="step-number">🍎</div>
+                <div class="step-content">
+                  <strong>Choose whole foods</strong>
+                  <p>Fruits, vegetables, whole grains, lean proteins, nuts</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">⚖️</div>
+                <div class="step-content">
+                  <strong>Limit processed foods</strong>
+                  <p>Consider reducing excessive sugar and ultra-processed foods</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">💧</div>
+                <div class="step-content">
+                  <strong>Stay hydrated</strong>
+                  <p>Drink water throughout the day, limit excessive caffeine</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tracking-section">
+            <div class="progress-tracker">
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="nutrition">
+                <span class="checkmark"></span>
+                I ate nutritious meals today
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="nutrition">
+                <span class="checkmark"></span>
+                I stayed hydrated
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy 5: Gratitude Journal -->
+      <div class="strategy-card" id="gratitude-card">
+        <div class="strategy-header">
+          <div class="strategy-icon">📝</div>
+          <div class="strategy-title">
+            <h3>Keep a Gratitude Journal</h3>
+            <div class="priority-badge medium">Medium Priority</div>
+          </div>
+        </div>
+
+        <div class="strategy-content">
+          <div class="why-section">
+            <h4>Why This Matters:</h4>
+            <p>When experiencing depression it can be hard to look beyond the negative aspects of life. Keeping a physical journal of good things can help as a tangible reminder that good things do exist.</p>
+          </div>
+
+          <div class="action-steps">
+            <h4>How to Start:</h4>
+            <div class="step-list">
+              <div class="action-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <strong>Write 3 things daily</strong>
+                  <p>Each day, write down 3 things you're grateful for, no matter how small</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <strong>Include positive moments</strong>
+                  <p>Note good things that happened, kind gestures, or small victories</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <strong>Review when needed</strong>
+                  <p>Read past entries when you're feeling overwhelmed</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mini-journal">
+            <h4>Quick Gratitude Entry:</h4>
+            <textarea id="gratitude-input" placeholder="Write something you're grateful for today..."></textarea>
+            <button id="save-gratitude" class="save-btn">Save Entry</button>
+            <div id="gratitude-entries" class="saved-entries"></div>
+          </div>
+
+          <div class="tracking-section">
+            <div class="progress-tracker">
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="gratitude">
+                <span class="checkmark"></span>
+                I wrote in my gratitude journal
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy 6: Sleep Improvement (conditional) -->
+      <div class="strategy-card" id="sleep-card" style="display: none;">
+        <div class="strategy-header">
+          <div class="strategy-icon">😴</div>
+          <div class="strategy-title">
+            <h3>Improve Your Sleep Quality</h3>
+            <div class="priority-badge high">High Priority</div>
+          </div>
+        </div>
+
+        <div class="strategy-content">
+          <div class="why-section">
+            <h4>Why This is Critical for You:</h4>
+            <p id="sleep-personalized">Based on your assessment, improving your sleep should be a top priority for your mental health.</p>
+          </div>
+
+          <div class="action-steps">
+            <h4>Sleep Improvement Plan:</h4>
+            <div class="step-list">
+              <div class="action-step">
+                <div class="step-number">🕘</div>
+                <div class="step-content">
+                  <strong>Set a consistent bedtime</strong>
+                  <p>Go to bed and wake up at the same time, even on weekends</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">📱</div>
+                <div class="step-content">
+                  <strong>Limit screens before bed</strong>
+                  <p>Put devices away 1 hour before sleep</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">🛏️</div>
+                <div class="step-content">
+                  <strong>Create a sleep environment</strong>
+                  <p>Dark, cool, quiet room with comfortable bedding</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Professional Resources -->
+    <div class="professional-resources">
+      <h2>Professional Support Resources</h2>
+      <div class="resources-grid">
+        <div class="resource-card">
+          <div class="resource-icon">🏥</div>
+          <h3>Campus Counseling</h3>
+          <p>Most universities offer free counseling services for students</p>
+          <button class="resource-btn">Find Campus Resources</button>
+        </div>
+
+        <div class="resource-card">
+          <div class="resource-icon">💊</div>
+          <h3>Primary Care</h3>
+          <p>Your doctor can help evaluate and treat depression</p>
+          <button class="resource-btn">Schedule Appointment</button>
+        </div>
+
+        <div class="resource-card">
+          <div class="resource-icon">🗣️</div>
+          <h3>Therapy</h3>
+          <p>Professional therapy can provide tools and support</p>
+          <button class="resource-btn">Find Therapists</button>
+        </div>
+
+        <div class="resource-card">
+          <div class="resource-icon">🤝</div>
+          <h3>Support Groups</h3>
+          <p>Connect with others who understand your experience</p>
+          <button class="resource-btn">Find Groups</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Summary -->
+    <div class="progress-summary">
+      <h2>Your Progress</h2>
+      <div class="progress-overview">
+        <div class="progress-stat">
+          <div class="stat-number" id="completed-strategies">0</div>
+          <div class="stat-label">Strategies Tried</div>
+        </div>
+        <div class="progress-stat">
+          <div class="stat-number" id="weekly-checkins">0</div>
+          <div class="stat-label">Weekly Check-ins</div>
+        </div>
+        <div class="progress-stat">
+          <div class="stat-number" id="gratitude-entries-count">0</div>
+          <div class="stat-label">Gratitude Entries</div>
+        </div>
+      </div>
+
+      <div class="motivation-message">
+        <p><strong>Remember:</strong> Depression is multifaceted and coping with depression is not as straightforward as these strategies. Every small step matters, and you're not alone in this journey.</p>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="coping-footer">
+      <button id="return-to-assessment" class="coping-btn secondary">
+        <span class="btn-icon">←</span>
+        Return to Assessment
+      </button>
+      <button id="share-strategies" class="coping-btn primary">
+        <span class="btn-icon">📤</span>
+        Share with Someone I Trust
+      </button>
+      <button id="save-strategies" class="coping-btn primary">
+        <span class="btn-icon">💾</span>
+        Save My Plan
+      </button>
+    </div>
+  </div>
+</div>
+
+
+    <!-- Scripts - COMPLETE VERSION WITH ALL NAVIGATION FIXES -->
+    <script type="module" src="./user-model.js"></script>
+    <script type="module" src="./script.js"></script>
+    <script type="module" src="post-assessment.js"></script>
+    <script>
+      // Basic navigation functions
+      function startGame() {
+        console.log('Starting game...');
+        document.getElementById("welcome-screen").classList.add("hidden");
+        document.getElementById("profiles-screen").classList.remove("hidden");
+      }
+
+      function goBack() {
+        console.log('Going back...');
+        document.getElementById("profiles-screen").classList.add("hidden");
+        document.getElementById("welcome-screen").classList.remove("hidden");
+        document.getElementById("visualization-panel").classList.add("hidden");
+
+        // Hide user assessment screens
+        const userScreens = ['user-profile', 'user-results-screen'];
+        userScreens.forEach(screenId => {
+          const screen = document.getElementById(screenId);
+          if (screen) screen.classList.add('hidden');
+        });
+      }
+
+      // Wait for DOM to be ready
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM loaded, setting up event listeners...');
+
+        // Basic navigation
+        const backBtn = document.getElementById('back-button');
+        const startBtn = document.getElementById('start-button');
+
+        if (backBtn) {
+          backBtn.addEventListener('click', goBack);
+          console.log('Back button listener added');
+        } else {
+          console.error('Back button not found!');
+        }
+
+        if (startBtn) {
+          startBtn.addEventListener('click', startGame);
+          console.log('Start button listener added');
+        } else {
+          console.error('Start button not found!');
+        }
+
+        // NAVIGATION FIXES FOR "VIEW RISK INSIGHTS" BUTTONS
+        const nextToRiskBtn = document.getElementById("next-to-risk");
+        if (nextToRiskBtn) {
+          nextToRiskBtn.addEventListener("click", function() {
+            console.log('📊 Navigating to risk insights...');
+            document.getElementById("timeline-screen").classList.add("hidden");
+            document.getElementById("risk-panels-screen").classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          console.log('✅ Business timeline navigation fixed');
+        }
+
+        const nextFromEngineeringBtn = document.getElementById("next-from-engineering");
+        if (nextFromEngineeringBtn) {
+          nextFromEngineeringBtn.addEventListener("click", function() {
+            console.log('🔧 Navigating from engineering to risk insights...');
+            document.getElementById("engineering-matrix-screen").classList.add("hidden");
+            document.getElementById("risk-panels-screen").classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          console.log('✅ Engineering navigation fixed');
+        }
+
+        const nextFromArtsBtn = document.getElementById("next-from-arts");
+        if (nextFromArtsBtn) {
+          nextFromArtsBtn.addEventListener("click", function() {
+            console.log('🎨 Navigating from arts to risk insights...');
+            document.getElementById("arts-analysis-screen").classList.add("hidden");
+            document.getElementById("risk-panels-screen").classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          console.log('✅ Arts navigation fixed');
+        }
+
+        const nextFromMedicineBtn = document.getElementById("next-from-medicine");
+        if (nextFromMedicineBtn) {
+          nextFromMedicineBtn.addEventListener("click", function() {
+            console.log('🏥 Navigating from medicine to risk insights...');
+            document.getElementById("medicine-analysis-screen").classList.add("hidden");
+            document.getElementById("risk-panels-screen").classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          console.log('✅ Medicine navigation fixed');
+        }
+
+        const nextToUserBtn = document.getElementById("next-to-user");
+        if (nextToUserBtn) {
+          nextToUserBtn.addEventListener("click", function() {
+            console.log('👤 Navigating to user assessment...');
+            document.getElementById("risk-panels-screen").classList.add("hidden");
+            document.getElementById("user-profile").classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          console.log('✅ User assessment navigation fixed');
+        }
+
+        console.log('🎯 All navigation fixes applied successfully!');
+      });
+    </script>
+
+    <div class="tooltip" id="tooltip"></div>
   </body>
-  <div class="tooltip" id="tooltip"></div>
 </html>
