@@ -5,9 +5,10 @@
 import math
 import tensorflow as tf
 import pandas as pd
+import numpy as np
 # from tensorflow.keras import layers
 
-sampled = ['Work Pressure', 'Sleep Duration', 'Depression', 'Financial Stress', 'Work/Study Hours']
+sampled = ['Work Pressure', 'Sleep Duration', 'Depression', 'Financial Stress', 'Work/Study Hours', 'Academic Pressure']
 data = pd.read_csv('data/student_depression_dataset.csv')[sampled]
 data['Sleep Duration'] = data['Sleep Duration'].map({
     "'5-6 hours'": 2,
@@ -26,13 +27,27 @@ train_X.head()
 #+end_src
 
 #+RESULTS:
-|   | Work Pressure | Sleep Duration | Financial Stress | Work/Study Hours |
-|---+---------------+----------------+------------------+------------------|
-| 0 |           0.0 |            2.0 |              1.0 |              3.0 |
-| 1 |           0.0 |            2.0 |              2.0 |              3.0 |
-| 2 |           0.0 |            1.0 |              1.0 |              9.0 |
-| 3 |           0.0 |            3.0 |              5.0 |              4.0 |
-| 4 |           0.0 |            2.0 |              1.0 |              1.0 |
+|   | Work Pressure | Sleep Duration | Financial Stress | Work/Study Hours | Academic Pressure |
+|---+---------------+----------------+------------------+------------------+-------------------|
+| 0 |           0.0 |            2.0 |              1.0 |              3.0 |               5.0 |
+| 1 |           0.0 |            2.0 |              2.0 |              3.0 |               2.0 |
+| 2 |           0.0 |            1.0 |              1.0 |              9.0 |               3.0 |
+| 3 |           0.0 |            3.0 |              5.0 |              4.0 |               3.0 |
+| 4 |           0.0 |            2.0 |              1.0 |              1.0 |               4.0 |
+
+#+begin_src python :results table :session
+train_X['Academic Pressure'].describe()
+#+end_src
+
+#+RESULTS:
+| count |            27880.0 |
+| mean  | 3.1413199426111906 |
+| std   |  1.381720028037692 |
+| min   |                0.0 |
+| 25%   |                2.0 |
+| 50%   |                3.0 |
+| 75%   |                4.0 |
+| max   |                5.0 |
 
 * Train Model
 #+begin_src python :session :results verbatim
@@ -40,7 +55,9 @@ layers = tf.keras.layers
 train_X = train_X.to_numpy()
 test_X = test_X.to_numpy()
 
-normalize = layers.Normalization()
+in_shape = train_X.shape[1:]
+
+normalize = layers.Normalization(input_shape=in_shape)
 normalize.adapt(train_X)
 model = tf.keras.Sequential([
     normalize,
@@ -61,9 +78,27 @@ model.fit(train_X, train_y, epochs=10)
 #+begin_src python :session :results value
 probs = model.predict(test_X)
 predictions = (probs >= 0.5).astype(int)
-model.save('predictor.h5')
+model.export('predictor_save_model')
 (predictions.flatten() == test_y).sum() / test_y.shape[0]
 #+end_src
 
 #+RESULTS:
-: 0.6924318507890961
+: 0.771700143472023
+
+#+begin_src python :results table :session
+test_X[np.argmin(probs)]
+probs[np.argmin(probs)]
+list(pd.read_csv('data/student_depression_dataset.csv').columns)
+#+end_src
+
+#+RESULTS:
+| id | Gender | Age | City | Profession | Academic Pressure | Work Pressure | CGPA | Study Satisfaction | Job Satisfaction | Sleep Duration | Dietary Habits | Degree | Have you ever had suicidal thoughts ? | Work/Study Hours | Financial Stress | Family History of Mental Illness | Depression |
+
+* Save model to js
+#+begin_src bash :results verbatim
+source $HOME/.zshrc
+conda activate jstensor
+tensorflowjs_converter --input_format=tf_saved_model predictor_save_model/ javaScriptModel/
+#+end_src
+
+#+RESULTS:

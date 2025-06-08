@@ -6,6 +6,7 @@
     <title>Career Path Chronicles</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
+    <script src='https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script type="module" src="./user-ineract.js"></script>
     <script type="module" src="./script.js"></script>
@@ -84,7 +85,7 @@
       </div>
     </div>
 
-    <!-- User Profile Input Page -->
+    <!-- User Profile Input P -->
     <div id="user-profile" class="hidden">
       <h2>How are you feeling?</h2>
       <p class="instruction">Rate where you fall below to get a prediction of your major, and where your risk falls relative to the other majors</p>
@@ -92,6 +93,11 @@
       <div id="user-input">
         <!-- TODO: Rearange the order of this to be more intuitive for
         a user looking at the chart -->
+        <div class="userin slider">
+          <p>Work/Study Hours</p>
+          <input id="hrs" class="user-input" name="Work/Study Hours" type="range" value="0" min="0" max="24"/>
+          <label id='hrs-label' class="value" for=""></label>
+        </div>
         <div class="userin slider">
           <p>Academic Pressure:</p>
           <input class='user-input slider-input' id="ac-pressure" name="Academic Pressure" type="range" min=0 max=100 value="0"/>
@@ -120,14 +126,22 @@
         <div class="userin">
           <p>Amount of Sleep per night</p>
           <select class='user-input drop-input' id="sleep-amnt" name="Amount of Sleep">
-            <option value="5">Less than 5 Hours</option>
-            <option value="5-6">5–6 Hours</option>
-            <option value="7-8">7–8 Hours</option>
-            <option value="8">More than 8 Hours</option>
+            <option value="1">Less than 5 Hours</option>
+            <option value="2">5–6 Hours</option>
+            <option value="3">7–8 Hours</option>
+            <option value="4">More than 8 Hours</option>
           </select>
+        </div>
+        <div class="activate">
+          <input id="run-model" name="Predict" type="button" value="Make Prediction"/>
         </div>
       </div>
       <div id="user-sleep"></div>
+      <div id="user-risk" class='hidden'>
+        <h2>Your Risk Score:</h2>
+        <h3 class='score'></h3>
+        <div id="coping" class="hidden"></div>
+      </div>
     </div>
 
     <!-- Timeline Screen for Business Profile -->
