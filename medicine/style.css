@@ -1,0 +1,40 @@
+/* general */
+body{
+  background:#171c21;
+  color:#fff;
+  font-family:'Inter',sans-serif;
+}
+
+/* SVG wrapper */
+#matrix-container{
+  position:relative;
+  width:900px;
+  margin:0 auto;
+}
+
+/* fixed-position tooltip */
+#matrix-tooltip{
+  position:fixed;                 /* <-- KEY change */
+  pointer-events:none;
+  background:rgba(22,38,48,.97);
+  color:#eafffb;
+  padding:15px;
+  border-radius:11px;
+  font-size:1em;
+  opacity:0;
+  z-index:50;
+  min-width:180px;
+  border:1.5px solid #29d6ff;
+  box-shadow:0 8px 24px rgba(30,110,180,.16);
+  font-family:'Inter',sans-serif;
+  transition:opacity .13s;
+}
+
+.legend-dot{ stroke:#fff; stroke-width:1.5; }
+
+select,
+input[type=checkbox]{
+  margin-left:8px;
+  margin-right:5px;
+  font-size:1em;
+}
