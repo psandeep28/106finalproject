@@ -271,7 +271,7 @@ class UserAssessment {
         valueDisplay.style.transform = 'scale(1)';
       }, 150);
     }
-
+  
     // Update slider visual feedback
     const percentage = value / 100;
     const factorName = slider.name;
@@ -289,11 +289,20 @@ class UserAssessment {
       hsl(${hue}, 70%, 50%) ${percentage * 100}%, 
       #e9ecef ${percentage * 100}%, 
       #e9ecef 100%)`;
-
-    // Update userData
+  
+    // Update userData - KEEP ORIGINAL VALUES for the model
     const dataPoint = this.userData.detailData.find(d => d.factor === factorName);
     if (dataPoint) {
-      dataPoint.value = Number(value);
+      dataPoint.value = Number(value); // Store original value
+      
+      // Create display value for radar chart
+      if (factorName === 'Work-Life Balance' || 
+          factorName === 'Social Support' || 
+          factorName === 'Job Security') {
+        dataPoint.displayValue = 100 - Number(value); // Inverted for display
+      } else {
+        dataPoint.displayValue = Number(value); // Same as original
+      }
     }
   }
 
@@ -387,19 +396,27 @@ class UserAssessment {
       jobSecurity: Number(document.getElementById('job-sec').value),
       sleepDuration: document.getElementById('sleep-amnt').value
     };
-
+  
     // Calculate risk with enhanced model
     const result = this.predictDepressionRisk(userInputs);
     this.userData.depressionRate = Math.round(result.risk * 100);
     this.userData.confidence = result.confidence;
     this.userData.completed = true;
     this.userData.userInputs = userInputs;
-
-    // Show results with smooth transition
-    this.showResults();
+  
+    // Hide the assessment screen
     document.getElementById('user-profile').classList.add('hidden');
-    startPostAssessmentExploration(this.userData.userInputs);
-
+  
+    // ONLY start the post-assessment flow (sleep comparison, stress comparison, peer matching)
+    // Do NOT call coping strategies yet
+    if (typeof startPostAssessmentExploration === 'function') {
+      console.log('🎯 Starting post-assessment exploration flow...');
+      startPostAssessmentExploration(userInputs);
+    } else {
+      console.error('❌ Post-assessment function not found');
+      // Fallback to coping strategies if post-assessment isn't available
+      this.showCopingStrategies(userInputs);
+    }
   }
 
   // Enhanced prediction model

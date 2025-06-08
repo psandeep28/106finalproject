@@ -96,8 +96,26 @@ function createRadarChart(data, containId='#chart-container') {
   const g = svg.append("g")
     .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
+  // Create display data with inverted scales for protective factors
+  const displayData = data.detailData.map(d => {
+    const factor = d.factor;
+    let displayValue = d.value;
+    
+    // Invert protective factors so higher values = higher risk on chart
+    if (factor === 'Work-Life Balance' || 
+        factor === 'Social Support' || 
+        factor === 'Job Security') {
+      displayValue = 100 - d.value;
+    }
+    
+    return {
+      ...d,
+      displayValue: displayValue
+    };
+  });
+
   const angleScale = d3.scaleLinear()
-    .domain([0, data.detailData.length])
+    .domain([0, displayData.length])
     .range([0, 2 * Math.PI]);
 
   const radiusScale = d3.scaleLinear()
@@ -115,7 +133,7 @@ function createRadarChart(data, containId='#chart-container') {
   }
 
   // Axis lines and labels
-  data.detailData.forEach((d, i) => {
+  displayData.forEach((d, i) => {
     const angle = angleScale(i) - Math.PI / 2;
     const x = Math.cos(angle) * radius;
     const y = Math.sin(angle) * radius;
@@ -127,26 +145,45 @@ function createRadarChart(data, containId='#chart-container') {
       .attr("stroke-opacity", 0.5)
       .attr("stroke-width", 1);
 
+    // Enhanced labels with risk direction indicators
+    const labelText = d.factor;
+    const isInverted = d.factor === 'Work-Life Balance' || 
+                     d.factor === 'Social Support' || 
+                     d.factor === 'Job Security';
+    
     g.append("text")
-      .attr("x", Math.cos(angle) * (radius + 20))
-      .attr("y", Math.sin(angle) * (radius + 20))
+      .attr("x", Math.cos(angle) * (radius + 30))
+      .attr("y", Math.sin(angle) * (radius + 30))
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "middle")
       .attr("fill", "#00ffff")
       .attr("font-family", "Orbitron")
       .attr("font-size", "10px")
-      .text(d.factor);
+      .text(labelText);
+
+    // Add small indicator for inverted scales
+    if (isInverted) {
+      g.append("text")
+        .attr("x", Math.cos(angle) * (radius + 45))
+        .attr("y", Math.sin(angle) * (radius + 45))
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .attr("fill", "#ffff00")
+        .attr("font-family", "Orbitron")
+        .attr("font-size", "8px")
+        .text("⟲");
+    }
   });
 
-  // Area path
+  // Area path using display values
   const area = d3.areaRadial()
     .angle((d, i) => angleScale(i))
     .innerRadius(0)
-    .outerRadius(d => radiusScale(d.value))
+    .outerRadius(d => radiusScale(d.displayValue))
     .curve(d3.curveLinearClosed);
 
   const radarPath = g.append("path")
-    .datum(data.detailData)
+    .datum(displayData)
     .attr("fill", "#ff00ff")
     .attr("fill-opacity", 0.2)
     .attr("stroke", "#ff00ff")
@@ -185,12 +222,12 @@ function createRadarChart(data, containId='#chart-container') {
 
   // Data points with hover + click-to-lock
   g.selectAll(".data-point")
-    .data(data.detailData)
+    .data(displayData)
     .enter()
     .append("circle")
     .attr("class", "data-point")
-    .attr("cx", (d, i) => Math.cos(angleScale(i) - Math.PI / 2) * radiusScale(d.value))
-    .attr("cy", (d, i) => Math.sin(angleScale(i) - Math.PI / 2) * radiusScale(d.value))
+    .attr("cx", (d, i) => Math.cos(angleScale(i) - Math.PI / 2) * radiusScale(d.displayValue))
+    .attr("cy", (d, i) => Math.sin(angleScale(i) - Math.PI / 2) * radiusScale(d.displayValue))
     .attr("r", 4)
     .attr("fill", "#ffff00")
     .attr("stroke", "#ff00ff")
@@ -199,7 +236,17 @@ function createRadarChart(data, containId='#chart-container') {
     .on("mouseover", function(event, d) {
       if (locked) return;
       d3.select(this).transition().duration(150).attr("r", 7);
-      tooltip.html(`${d.factor}: ${d.value}%`)
+      
+      // Show original value in tooltip, not display value
+      const isInverted = d.factor === 'Work-Life Balance' || 
+                        d.factor === 'Social Support' || 
+                        d.factor === 'Job Security';
+      
+      const tooltipText = isInverted 
+        ? `${d.factor}: ${d.value}% (showing risk: ${d.displayValue}%)`
+        : `${d.factor}: ${d.value}%`;
+      
+      tooltip.html(tooltipText)
         .style("left", event.pageX + 10 + "px")
         .style("top", event.pageY - 30 + "px")
         .style("opacity", 1);
@@ -214,7 +261,16 @@ function createRadarChart(data, containId='#chart-container') {
       if (locked) {
         d3.selectAll(".data-point").attr("r", 4);
         d3.select(this).attr("r", 7);
-        tooltip.html(`${d.factor}: ${d.value}%`)
+        
+        const isInverted = d.factor === 'Work-Life Balance' || 
+                          d.factor === 'Social Support' || 
+                          d.factor === 'Job Security';
+        
+        const tooltipText = isInverted 
+          ? `${d.factor}: ${d.value}% (showing risk: ${d.displayValue}%)`
+          : `${d.factor}: ${d.value}%`;
+        
+        tooltip.html(tooltipText)
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 30 + "px")
           .style("opacity", 1);
@@ -224,7 +280,14 @@ function createRadarChart(data, containId='#chart-container') {
       }
     });
 
-
+  // Add legend explaining the inversion
+  g.append("text")
+    .attr("x", -radius)
+    .attr("y", radius + 25)
+    .attr("fill", "#ffff00")
+    .attr("font-family", "Orbitron")
+    .attr("font-size", "9px")
+    .text("⟲ = Inverted scale (larger area = higher risk)");
 }
 
 // Enhanced next-to-user functionality with integrated assessment

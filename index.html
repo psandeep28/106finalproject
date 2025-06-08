@@ -9,6 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.0.0/dist/tf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script src="medicine-spiral.js"></script>
+    <script src="coping-strategies.js"></script>
+
   </head>
   <body>
     <!-- Welcome Screen -->
@@ -886,6 +888,478 @@
         </div>
       </div>
     </div>
+
+<!-- Add this screen to your HTML, after the peer-matching-screen -->
+
+<!-- Personalized Coping Strategies Screen -->
+<div id="coping-strategies-screen" class="page hidden">
+  <div class="coping-container">
+    <!-- Header with Emergency Resources -->
+    <div class="coping-header">
+      <div class="emergency-banner">
+        <div class="emergency-icon">🚨</div>
+        <div class="emergency-content">
+          <h3>Emergency Resources</h3>
+          <p><strong>If this is an emergency:</strong> Call 911 (Emergency Services) or 988 (Suicide & Crisis Lifeline)</p>
+          <div class="emergency-buttons">
+            <a href="tel:911" class="emergency-btn critical">🚨 Call 911</a>
+            <a href="tel:988" class="emergency-btn crisis">💬 Call 988</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="disclaimer">
+        <p><strong>Important:</strong> These strategies are educational resources, not medical advice. Please consult your primary care or mental health provider for professional guidance.</p>
+      </div>
+
+      <h1 class="coping-title">
+        <span class="title-icon">🛠️</span>
+        Your Personalized Coping Strategies
+      </h1>
+      <p class="coping-subtitle">
+        Based on your assessment, here are evidence-based strategies tailored to your needs
+      </p>
+      <div id="user-risk-summary" class="user-risk-summary">
+        <!-- Dynamic risk summary will be inserted here -->
+      </div>
+    </div>
+
+    <!-- Personalized Strategies Grid -->
+    <div class="strategies-grid">
+      
+      <!-- Strategy 1: Social Support -->
+      <div class="strategy-card" id="social-support-card">
+        <div class="strategy-header">
+          <div class="strategy-icon">🤝</div>
+          <div class="strategy-title">
+            <h3>Stay Connected with Your Support Network</h3>
+            <div class="priority-badge" id="social-priority">Medium Priority</div>
+          </div>
+        </div>
+        
+        <div class="strategy-content">
+          <div class="why-section">
+            <h4>Why This Matters for You:</h4>
+            <p id="social-personalized">Positive social interactions have been shown to lessen symptoms of depression.</p>
+          </div>
+          
+          <div class="strategy-description">
+            <p>Though depression may cause you to feel like you need to isolate yourself–please don't. Even small social interactions can make a meaningful difference.</p>
+          </div>
+          
+          <div class="action-steps">
+            <h4>Your Action Plan:</h4>
+            <div class="step-list">
+              <div class="action-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <strong>Reach out to one person today</strong>
+                  <p>Send a text, make a call, or schedule coffee with someone you trust</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <strong>Join a group activity</strong>
+                  <p>Study group, club, intramural sport, or community event</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <strong>Schedule regular check-ins</strong>
+                  <p>Weekly calls with family or friends, even just 10 minutes</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="tracking-section">
+            <h4>Track Your Progress:</h4>
+            <div class="progress-tracker">
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="social">
+                <span class="checkmark"></span>
+                I reached out to someone this week
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="social">
+                <span class="checkmark"></span>
+                I participated in a social activity
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy 2: Exercise -->
+      <div class="strategy-card" id="exercise-card">
+        <div class="strategy-header">
+          <div class="strategy-icon">🏃‍♂️</div>
+          <div class="strategy-title">
+            <h3>Implement Regular Exercise</h3>
+            <div class="priority-badge high">High Priority</div>
+          </div>
+        </div>
+        
+        <div class="strategy-content">
+          <div class="why-section">
+            <h4>Why This Matters:</h4>
+            <p>Even 20 minutes of exercise can improve symptoms of depression due to the natural release of endorphins during exercise.</p>
+          </div>
+          
+          <div class="action-steps">
+            <h4>Start Small, Build Up:</h4>
+            <div class="step-list">
+              <div class="action-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <strong>Begin with a 20-minute walk</strong>
+                  <p>Perfect for beginners - walk around campus, neighborhood, or local park</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <strong>Try campus fitness resources</strong>
+                  <p>Gym, fitness classes, swimming pool, or recreation center</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <strong>Find activities you enjoy</strong>
+                  <p>Dancing, hiking, sports, yoga, or even active video games</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="tracking-section">
+            <div class="progress-tracker">
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="exercise">
+                <span class="checkmark"></span>
+                I exercised for 20+ minutes this week
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="exercise">
+                <span class="checkmark"></span>
+                I found a physical activity I enjoy
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy 3: Self Care -->
+      <div class="strategy-card" id="selfcare-card">
+        <div class="strategy-header">
+          <div class="strategy-icon">🛁</div>
+          <div class="strategy-title">
+            <h3>Maintain Self Care</h3>
+            <div class="priority-badge" id="selfcare-priority">Medium Priority</div>
+          </div>
+        </div>
+        
+        <div class="strategy-content">
+          <div class="why-section">
+            <h4>Why This Matters for You:</h4>
+            <p id="selfcare-personalized">Severe depression can make it harder to keep up regular hygiene as a routine.</p>
+          </div>
+          
+          <div class="strategy-description">
+            <p>If a whole routine seems too daunting, try prioritizing one act per day. Even something as simple as brushing your teeth is a step towards self care.</p>
+          </div>
+          
+          <div class="action-steps">
+            <h4>Daily Self-Care Checklist:</h4>
+            <div class="step-list">
+              <div class="action-step">
+                <div class="step-number">✓</div>
+                <div class="step-content">
+                  <strong>Basic hygiene</strong>
+                  <p>Brush teeth, wash face, shower when possible</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">✓</div>
+                <div class="step-content">
+                  <strong>Comfortable clothing</strong>
+                  <p>Wear clean clothes that make you feel good</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">✓</div>
+                <div class="step-content">
+                  <strong>Small comforts</strong>
+                  <p>Make your bed, tidy your space, or enjoy a warm drink</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="tracking-section">
+            <div class="progress-tracker">
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="selfcare">
+                <span class="checkmark"></span>
+                I completed my basic hygiene routine
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="selfcare">
+                <span class="checkmark"></span>
+                I did something nice for myself
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy 4: Nutrition -->
+      <div class="strategy-card" id="nutrition-card">
+        <div class="strategy-header">
+          <div class="strategy-icon">🥗</div>
+          <div class="strategy-title">
+            <h3>Focus on Nutritious Eating</h3>
+            <div class="priority-badge" id="nutrition-priority">Medium Priority</div>
+          </div>
+        </div>
+        
+        <div class="strategy-content">
+          <div class="why-section">
+            <h4>Why This Matters:</h4>
+            <p>Depression can cause changes in appetite. Regardless of whether you experience an increase or decrease in appetite, focus on consuming whole foods.</p>
+          </div>
+          
+          <div class="action-steps">
+            <h4>Nutrition Guidelines:</h4>
+            <div class="step-list">
+              <div class="action-step">
+                <div class="step-number">🍎</div>
+                <div class="step-content">
+                  <strong>Choose whole foods</strong>
+                  <p>Fruits, vegetables, whole grains, lean proteins, nuts</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">⚖️</div>
+                <div class="step-content">
+                  <strong>Limit processed foods</strong>
+                  <p>Consider reducing excessive sugar and ultra-processed foods</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">💧</div>
+                <div class="step-content">
+                  <strong>Stay hydrated</strong>
+                  <p>Drink water throughout the day, limit excessive caffeine</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="tracking-section">
+            <div class="progress-tracker">
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="nutrition">
+                <span class="checkmark"></span>
+                I ate nutritious meals today
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="nutrition">
+                <span class="checkmark"></span>
+                I stayed hydrated
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy 5: Gratitude Journal -->
+      <div class="strategy-card" id="gratitude-card">
+        <div class="strategy-header">
+          <div class="strategy-icon">📝</div>
+          <div class="strategy-title">
+            <h3>Keep a Gratitude Journal</h3>
+            <div class="priority-badge medium">Medium Priority</div>
+          </div>
+        </div>
+        
+        <div class="strategy-content">
+          <div class="why-section">
+            <h4>Why This Matters:</h4>
+            <p>When experiencing depression it can be hard to look beyond the negative aspects of life. Keeping a physical journal of good things can help as a tangible reminder that good things do exist.</p>
+          </div>
+          
+          <div class="action-steps">
+            <h4>How to Start:</h4>
+            <div class="step-list">
+              <div class="action-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <strong>Write 3 things daily</strong>
+                  <p>Each day, write down 3 things you're grateful for, no matter how small</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <strong>Include positive moments</strong>
+                  <p>Note good things that happened, kind gestures, or small victories</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <strong>Review when needed</strong>
+                  <p>Read past entries when you're feeling overwhelmed</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mini-journal">
+            <h4>Quick Gratitude Entry:</h4>
+            <textarea id="gratitude-input" placeholder="Write something you're grateful for today..."></textarea>
+            <button id="save-gratitude" class="save-btn">Save Entry</button>
+            <div id="gratitude-entries" class="saved-entries"></div>
+          </div>
+          
+          <div class="tracking-section">
+            <div class="progress-tracker">
+              <label class="checkbox-item">
+                <input type="checkbox" class="strategy-checkbox" data-strategy="gratitude">
+                <span class="checkmark"></span>
+                I wrote in my gratitude journal
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy 6: Sleep Improvement (conditional) -->
+      <div class="strategy-card" id="sleep-card" style="display: none;">
+        <div class="strategy-header">
+          <div class="strategy-icon">😴</div>
+          <div class="strategy-title">
+            <h3>Improve Your Sleep Quality</h3>
+            <div class="priority-badge high">High Priority</div>
+          </div>
+        </div>
+        
+        <div class="strategy-content">
+          <div class="why-section">
+            <h4>Why This is Critical for You:</h4>
+            <p id="sleep-personalized">Based on your assessment, improving your sleep should be a top priority for your mental health.</p>
+          </div>
+          
+          <div class="action-steps">
+            <h4>Sleep Improvement Plan:</h4>
+            <div class="step-list">
+              <div class="action-step">
+                <div class="step-number">🕘</div>
+                <div class="step-content">
+                  <strong>Set a consistent bedtime</strong>
+                  <p>Go to bed and wake up at the same time, even on weekends</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">📱</div>
+                <div class="step-content">
+                  <strong>Limit screens before bed</strong>
+                  <p>Put devices away 1 hour before sleep</p>
+                </div>
+              </div>
+              <div class="action-step">
+                <div class="step-number">🛏️</div>
+                <div class="step-content">
+                  <strong>Create a sleep environment</strong>
+                  <p>Dark, cool, quiet room with comfortable bedding</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Professional Resources -->
+    <div class="professional-resources">
+      <h2>Professional Support Resources</h2>
+      <div class="resources-grid">
+        <div class="resource-card">
+          <div class="resource-icon">🏥</div>
+          <h3>Campus Counseling</h3>
+          <p>Most universities offer free counseling services for students</p>
+          <button class="resource-btn">Find Campus Resources</button>
+        </div>
+        
+        <div class="resource-card">
+          <div class="resource-icon">💊</div>
+          <h3>Primary Care</h3>
+          <p>Your doctor can help evaluate and treat depression</p>
+          <button class="resource-btn">Schedule Appointment</button>
+        </div>
+        
+        <div class="resource-card">
+          <div class="resource-icon">🗣️</div>
+          <h3>Therapy</h3>
+          <p>Professional therapy can provide tools and support</p>
+          <button class="resource-btn">Find Therapists</button>
+        </div>
+        
+        <div class="resource-card">
+          <div class="resource-icon">🤝</div>
+          <h3>Support Groups</h3>
+          <p>Connect with others who understand your experience</p>
+          <button class="resource-btn">Find Groups</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Summary -->
+    <div class="progress-summary">
+      <h2>Your Progress</h2>
+      <div class="progress-overview">
+        <div class="progress-stat">
+          <div class="stat-number" id="completed-strategies">0</div>
+          <div class="stat-label">Strategies Tried</div>
+        </div>
+        <div class="progress-stat">
+          <div class="stat-number" id="weekly-checkins">0</div>
+          <div class="stat-label">Weekly Check-ins</div>
+        </div>
+        <div class="progress-stat">
+          <div class="stat-number" id="gratitude-entries-count">0</div>
+          <div class="stat-label">Gratitude Entries</div>
+        </div>
+      </div>
+      
+      <div class="motivation-message">
+        <p><strong>Remember:</strong> Depression is multifaceted and coping with depression is not as straightforward as these strategies. Every small step matters, and you're not alone in this journey.</p>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="coping-footer">
+      <button id="return-to-assessment" class="coping-btn secondary">
+        <span class="btn-icon">←</span>
+        Return to Assessment
+      </button>
+      <button id="share-strategies" class="coping-btn primary">
+        <span class="btn-icon">📤</span>
+        Share with Someone I Trust
+      </button>
+      <button id="save-strategies" class="coping-btn primary">
+        <span class="btn-icon">💾</span>
+        Save My Plan
+      </button>
+    </div>
+  </div>
+</div>
+    
 
     <!-- Scripts - COMPLETE VERSION WITH ALL NAVIGATION FIXES -->
     <script type="module" src="./user-model.js"></script>

@@ -354,32 +354,73 @@ function createPeerDepressionChart(depressionRate) {
     .text('Your Peers');
 }
 
+// Fixed function in post-assessment.js
 function showFinalRiskAssessment() {
     // Hide the peer screen
     document.getElementById('peer-matching-screen').classList.add('hidden');
   
-    // Show the original final results screen
-    if (window.userAssessment && typeof window.userAssessment.showOriginalResults === 'function') {
-      window.userAssessment.showOriginalResults();
+    // NOW start the coping strategies (not the original results)
+    console.log('🛠️ Moving to coping strategies after post-assessment...');
+    
+    // Get user inputs from the global scope or retrieve them
+    const userInputs = window.currentUserInputs || {
+      academicPressure: 50,
+      financialStress: 50,
+      workLifeBalance: 50,
+      socialSupport: 50,
+      jobSecurity: 50,
+      sleepDuration: '7-8'
+    };
+  
+    // Show coping strategies screen
+    const copingScreen = document.getElementById('coping-strategies-screen');
+    if (copingScreen) {
+      copingScreen.classList.remove('hidden');
+      
+      // Add entrance animation
+      copingScreen.style.opacity = '0';
+      copingScreen.style.transform = 'translateY(20px)';
+      
+      setTimeout(() => {
+        copingScreen.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+        copingScreen.style.opacity = '1';
+        copingScreen.style.transform = 'translateY(0)';
+      }, 100);
+      
+      // Personalize the strategies
+      setTimeout(() => {
+        if (typeof personalizeStrategies === 'function') {
+          personalizeStrategies(userInputs);
+        }
+        if (typeof initializeCopingFeatures === 'function') {
+          initializeCopingFeatures();
+        }
+      }, 200);
+      
+      // Smooth scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      console.log('✅ Coping strategies screen loaded successfully');
     } else {
-      console.warn("Original results method not available.");
+      console.error('❌ Coping strategies screen not found in DOM');
     }
-  
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-
-// Export function to be called after user completes assessment
-window.startPostAssessmentExploration = function(userInputs) {
-  console.log('Starting post-assessment exploration with user inputs:', userInputs);
   
-  // Hide the assessment screen
-  document.getElementById('user-profile').classList.add('hidden');
-  
-  // Populate all the comparison data
-  populateUserComparisons(userInputs);
-  
-  // Show the first comparison screen
-  document.getElementById('your-sleep-comparison').classList.remove('hidden');
-  
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
+  // Enhanced post-assessment flow
+  window.startPostAssessmentExploration = function(userInputs) {
+    console.log('Starting post-assessment exploration with user inputs:', userInputs);
+    
+    // Store user inputs globally so they can be accessed later
+    window.currentUserInputs = userInputs;
+    
+    // Hide the assessment screen
+    document.getElementById('user-profile').classList.add('hidden');
+    
+    // Populate all the comparison data
+    populateUserComparisons(userInputs);
+    
+    // Show the first comparison screen (sleep comparison)
+    document.getElementById('your-sleep-comparison').classList.remove('hidden');
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
